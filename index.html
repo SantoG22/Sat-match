@@ -123,13 +123,15 @@
       line-height: 1;
     }
 
-    /* RECOVERY LEITNER FOLDERS */
+    /* RECOVERY LEITNER FOLDERS - VISIBILITÀ GARANTITA */
     .leitner-container {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      flex: 1;
-      margin-top: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
     }
 
     .leitner-due-card {
@@ -145,18 +147,16 @@
     .leitner-folders-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      overflow-y: auto;
-      max-height: 380px;
-      padding-right: 4px;
+      gap: 8px;
+      padding-bottom: 20px;
     }
 
     .folder-box {
       background: var(--card-alt);
       border: 1px solid var(--border);
       border-radius: 8px;
-      overflow: hidden;
-      transition: border-color 0.2s;
+      overflow: visible;
+      transition: all 0.2s;
     }
 
     .folder-box:hover {
@@ -740,7 +740,7 @@
           { id: "ADV-11-B", type: "mcq", q: "Resto della divisione di (x² + 5x + 7) per (x - 1):", options: ["13", "7", "1", "3"], ans: "13", title: "RESTO POLINOMIALE", alg: ["1. P(1) = 1 + 5 + 7 = 13."], dsm: ["P(1) = 13."], gType: "parabola" },
           { id: "ADV-12-B", type: "spr", q: "Se x² + y² = 36, qual è l'area del cerchio divisa per π?", ans: "36", title: "AREA DA EQUAZIONE", alg: ["1. r² = 36", "2. Area = π r² = 36π => Diviso π fa 36."], dsm: ["36."], gType: "circle" },
           { id: "ADV-13-B", type: "mcq", q: "Per quanti valori x si intersecano y = x² e y = 4?", options: ["2", "1", "0", "4"], ans: "2", title: "INTERSEZIONE", alg: ["1. x² = 4 => x = ±2 (2 valori)."], dsm: ["Due punti."], gType: "parabola" },
-          { id: "ADV-14-B", type: "spr", q: "Se (x + 3)(x - 5) = -15, qual è la对方zione positiva per x?", ans: "2", title: "EQUAZIONE DI SECONDO GRADO", alg: ["1. x² - 2x - 15 = -15 => x² - 2x = 0", "2. x(x - 2) = 0 => soluzione positiva = 2."], dsm: ["x = 2."], gType: "parabola" },
+          { id: "ADV-14-B", type: "spr", q: "Se (x + 3)(x - 5) = -15, qual è la soluzione positiva per x?", ans: "2", title: "EQUAZIONE DI SECONDO GRADO", alg: ["1. x² - 2x - 15 = -15 => x² - 2x = 0", "2. x(x - 2) = 0 => soluzione positiva = 2."], dsm: ["x = 2."], gType: "parabola" },
           { id: "ADV-15-B", type: "mcq", q: "Qual è l'asintoto orizzontale di y = (3x + 1) / (x - 2)?", options: ["y = 3", "x = 2", "y = 0", "y = -1/2"], ans: "y = 3", title: "ASINTOTO ORIZZONTALE", alg: ["1. Rapporto coefficienti di grado max: 3 / 1 = 3."], dsm: ["y = 3."], gType: "line" }
         ]
       },
@@ -844,7 +844,7 @@
       { box: 5, name: "Cartella 5: Memoria a Lungo Termine", intervalDays: 30, desc: "Ripasso ogni 30 giorni" }
     ];
 
-    let openFoldersState = { 1: true }; // Cartella 1 aperta di default
+    let openFoldersState = { 1: true, 2: false, 3: false, 4: false, 5: false };
     let isRetryingRecovery = false;
     let activeRecoveryQ = null;
 
@@ -886,7 +886,7 @@
         id: q.id,
         title: q.title,
         category: currentCategory,
-        box: 1, // Retrocessione automatica al Box 1 secondo Leitner
+        box: 1,
         lastReviewed: getTodayString(),
         nextReview: addDays(1),
         failCount: (existing.failCount || 0) + 1
@@ -902,7 +902,6 @@
 
       const currentBox = data[qid].box || 1;
       if (currentBox >= 5) {
-        // Padroneggiato completamente
         delete data[qid];
       } else {
         const nextBox = currentBox + 1;
