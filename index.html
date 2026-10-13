@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Digital SAT Math - Visual Mastery Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Desmos API Ufficiale -->
+  <script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+
+  <style>
+    /* Rimozione Forzata Banner paste.page */
+    a[href*="paste.page"],
+    div[class*="paste-page"],
+    div[style*="position: fixed"][style*="bottom"],
+    body > div:last-child:has(a[href*="paste.page"]),
+    div:has(> a[href*="paste.page"]) {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    :root {
+      --bg: #0b0e14;
+      --card-bg: #151921;
+      --card-alt: #1c232d;
+      --border: #2d3748;
+      --text: #e2e8f0;
+      --text-muted: #8a99ad;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --success: #22c55e;
+      --error: #ef4444;
+      --warn: #eab308;
+      --purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: row;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* SIDEBAR */
+    #sidebar {
+      width: 320px;
+      min-width: 290px;
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 700;
+    }
+
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .category-btn {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .category-btn:hover {
+      border-color: var(--accent);
+      background: #232c38;
+    }
+
+    .category-btn.active {
+      border-color: var(--accent);
+      background: #18283e;
+      color: #fff;
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    .category-icon {
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    /* AREA CENTRALE */
+    #main-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      overflow-y: auto;
+      gap: 16px;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      gap: 10px;
+    }
+
+    .badges-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge {
+      background: #1f2937;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .badge-level { color: var(--warn); }
+    .badge-progress { color: #fff; background: #374151; }
+
+    .pacing-timer {
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: #1f2937;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+    .pacing-normal { color: var(--accent); border: 1px solid var(--border); }
+    .pacing-warn { color: var(--warn); border: 1px solid var(--warn); }
+    .pacing-danger { color: var(--error); border: 1px solid var(--error); animation: pulse 1s infinite alternate; }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      100% { opacity: 0.6; transform: scale(1.02); }
+    }
+
+    .question-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .q-text {
+      font-size: 1.18rem;
+      line-height: 1.6;
+      margin-bottom: 22px;
+      color: #f8fafc;
+      font-weight: 500;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .btn-opt {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 13px 16px;
+      text-align: left;
+      border-radius: 8px;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-opt:hover {
+      background: #27313f;
+      border-color: var(--accent);
+    }
+
+    .btn-opt.selected {
+      border-color: var(--accent);
+      background: #1e3a5f;
+      color: #fff;
+    }
+
+    .spr-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 320px;
+    }
+
+    .spr-input {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0b0e14;
+      color: #fff;
+      font-size: 1.25rem;
+      text-align: center;
+    }
+
+    .spr-rules {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .action-btn-group {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: var(--accent);
+      color: #0b0e14;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.92rem;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-btn:hover { background: var(--accent-hover); color: #fff; }
+
+    .action-btn-skip {
+      background: #374151;
+      color: #fca5a5;
+      border: 1px solid #4b5563;
+    }
+    .action-btn-skip:hover { background: #4b5563; color: #fff; border-color: var(--error); }
+
+    .action-btn-secondary {
+      background: #212936;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    #visual-solution-card {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+    }
+
+    .solution-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    #solution-canvas {
+      width: 100%;
+      max-width: 900px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      display: block;
+      margin-top: 8px;
+      background: #090d16;
+      border: 1px solid var(--border);
+    }
+
+    /* RECOVERY BOX ATTIVO & RIPETIBILE */
+    .recovery-item {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .recovery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .recovery-retry-btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .recovery-retry-btn:hover { background: #1d4ed8; }
+
+    .recovery-stage {
+      font-size: 0.72rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #374151;
+      color: var(--accent);
+    }
+
+    /* DESMOS */
+    #desmos-sidebar {
+      width: 380px;
+      min-width: 330px;
+      background: var(--card-bg);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 1100px) {
+      body { flex-direction: column; }
+      #sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      #desmos-sidebar { width: 100%; height: 480px; border-left: none; border-top: 1px solid var(--border); }
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 24px;
+      width: 90%;
+      max-width: 680px;
+      border-radius: 14px;
+      color: #fff;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    #ref-sheet-canvas {
+      width: 100%;
+      border-radius: 8px;
+      background: #090d16;
+      border: 1px solid var(--border);
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="brand-title">
+      <span>📐</span>
+      <span>Digital SAT Math</span>
+    </div>
+
+    <button class="action-btn action-btn-secondary" onclick="openReferenceSheet()">
+      📋 Reference Sheet Ufficiale
+    </button>
+
+    <div class="section-label">Aree di Competenza (15 Q)</div>
+    <div class="category-list">
+      <button class="category-btn active" onclick="selectCategory('algebra')">
+        <span class="category-icon">🔵</span>
+        <div>
+          <div>Heart of Algebra</div>
+          <small style="color:var(--text-muted); font-size:0.75rem;">Equazioni, Rette, Sistemi</small>
+        </div>
+      </button>
+
+      <button class="category-btn" onclick="selectCategory('advanced')">
+        <span class="category-icon">🟣</span>
+        <div>
+          <div>Advanced Math</div>
+          <small style="color:var(--text-muted); font-size:0.75rem;">Parabole, Radici, Funzioni</small>
+        </div>
+      </button>
+
+      <button class="category-btn" onclick="selectCategory('psda')">
+        <span class="category-icon">🟢</span>
+        <div>
+          <div>Problem Solving & Data</div>
+          <small style="color:var(--text-muted); font-size:0.75rem;">Percentuali, Statistica, Grafici</small>
+        </div>
+      </button>
+
+      <button class="category-btn" onclick="selectCategory('geometry')">
+        <span class="category-icon">🟠</span>
+        <div>
+          <div>Geometry & Trig</div>
+          <small style="color:var(--text-muted); font-size:0.75rem;">Cerchi, Triangoli notevoli, Volumi</small>
+        </div>
+      </button>
+    </div>
+
+    <!-- RECOVERY BOX -->
+    <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-top: 10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+        <span class="section-label" style="margin:0;">🎯 Recovery Box</span>
+        <span id="recovery-count" style="color: var(--accent); font-weight:700; font-size:0.85rem;">0</span>
+      </div>
+      <p style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px;">
+        Clicca su "Ripeti" per affrontare subito l'errore e padroneggiarlo.
+      </p>
+      <div id="recovery-list" style="overflow-y: auto; flex: 1;">
+        <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Nessun errore registrato.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main-content">
+    <div class="top-bar">
+      <div class="badges-container">
+        <span class="badge" id="category-badge">🔵 HEART OF ALGEBRA</span>
+        <span class="badge badge-progress" id="progress-badge">QUESITO 1 / 15</span>
+        <span class="badge badge-level" id="difficulty-badge">LIV. 1 (FOUNDATIONS)</span>
+      </div>
+      <div class="pacing-timer pacing-normal" id="pacing-timer">
+        ⏱ Domanda: <span id="q-clock">00:00</span>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-text" id="question-text">Caricamento quesito...</div>
+      <div id="answer-container"></div>
+
+      <div class="action-btn-group">
+        <button class="action-btn" id="submit-btn" onclick="submitAnswer()">Invia Risposta</button>
+        <button class="action-btn action-btn-skip" id="skip-btn" onclick="skipQuestion()">⏭ Salta (Segna Errato)</button>
+        <button class="action-btn" id="next-btn" style="display:none; background: var(--success);" onclick="nextQuestion()">Prossimo Quesito ➔</button>
+      </div>
+    </div>
+
+    <!-- SCHEDA VISIVA A IMMAGINE -->
+    <div id="visual-solution-card">
+      <div class="solution-header">
+        <div>
+          <h3 id="result-status" style="font-size: 1.15rem;"></h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Spiegazione illustrata generata per assimilare il concetto.
+          </p>
+        </div>
+        <button class="action-btn action-btn-secondary" onclick="downloadSolutionImage()">
+          💾 Salva Scheda (PNG)
+        </button>
+      </div>
+
+      <canvas id="solution-canvas" width="920" height="470"></canvas>
+    </div>
+  </main>
+
+  <!-- DESMOS -->
+  <div id="desmos-sidebar">
+    <div style="padding: 11px 14px; background: #1a222d; border-bottom: 1px solid var(--border); font-size: 0.82rem; font-weight: 700; display:flex; justify-content:space-between; align-items:center;">
+      <span>Desmos Official Emulator</span>
+      <button onclick="calculator.setBlank()" style="background:#2d3748; color:#cbd5e1; border:none; padding:3px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer;">Pulisci</button>
+    </div>
+    <div id="calculator" style="flex: 1; min-height: 400px;"></div>
+  </div>
+
+  <!-- MODAL FINE CATEGORIA CON RIGENERAZIONE -->
+  <div class="modal" id="finish-modal">
+    <div class="modal-content" style="max-width: 520px; text-align: center;">
+      <h2 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--accent);">🎉 Categoria Completata!</h2>
+      <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px;">
+        Hai completato tutti i 15 quesiti di questa sezione (dal Livello 1 al Livello 5).
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="action-btn" style="background: var(--success);" onclick="resetAndGenerateNewSet()">
+          🔄 Reset & Genera Nuovi Esercizi
+        </button>
+        <button class="action-btn action-btn-secondary" onclick="closeFinishModal()">
+          Chiudi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL REFERENCE SHEET -->
+  <div class="modal" id="ref-modal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>College Board Math Reference Sheet</h3>
+        <button onclick="closeReferenceSheet()" style="background:none; border:none; color:#fff; font-size: 1.3rem; cursor:pointer;">✖</button>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Formule ufficiali fornite all'esame.</p>
+      <canvas id="ref-sheet-canvas" width="620" height="380"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Rimozione continua di paste.page watermark
+    setInterval(() => {
+      document.querySelectorAll('a[href*="paste.page"]').forEach(el => {
+        const parent = el.closest('div');
+        if (parent) parent.remove();
+        else el.remove();
+      });
+    }, 400);
+
+    // Inizializzazione Desmos
+    const elt = document.getElementById('calculator');
+    const calculator = Desmos.GraphingCalculator(elt, {
+      keypad: true,
+      expressions: true,
+      settingsMenu: false
+    });
+
+    // BANCA DATI MULTI-SET (SET 1 & SET 2 CON ESERCIZI DIVERSI)
+    const questionSets = {
+      algebra: {
+        set1: [
+          { id: "ALG-01", type: "mcq", q: "Se 3x + 7 = 22, qual è il valore di x?", options: ["3", "5", "7", "15"], ans: "5", title: "EQUAZIONE LINEARE BASE", alg: ["1. 3x = 22 - 7 = 15", "2. x = 15 / 3 = 5"], dsm: ["Digita 3x + 7 = 22. Risposta: x = 5."], gType: "line" },
+          { id: "ALG-02", type: "mcq", q: "Qual è la pendenza della retta data da y = 4x - 9?", options: ["-9", "4", "-4", "9/4"], ans: "4", title: "COEFFICIENTE ANGOLARE", alg: ["1. Forma esplicita y = mx + q", "2. Coefficiente angolare m = 4."], dsm: ["La pendenza m compare direttamente davanti alla x: 4."], gType: "line" },
+          { id: "ALG-03", type: "spr", q: "Se 2(x - 4) = 12, qual è il valore di x?", ans: "10", title: "EQUAZIONE CON PARENTESI", alg: ["1. x - 4 = 6", "2. x = 10."], dsm: ["Digita 2(x - 4) = 12 e clicca sull'intersezione x = 10."], gType: "line" },
+          { id: "ALG-04", type: "mcq", q: "Se 2x + 3y = 12 e 4x - y = 10, qual è il valore di x?", options: ["2", "3", "4", "5"], ans: "3", title: "SISTEMA LINEARE", alg: ["1. 12x - 3y = 30", "2. 14x = 42 => x = 3."], dsm: ["Digita entrambe le equazioni e tocca l'intersezione (3, 2)."], gType: "system" },
+          { id: "ALG-05", type: "mcq", q: "Una retta passa per (0, 3) e (2, 7). Qual è la sua equazione?", options: ["y = 2x + 3", "y = 3x + 2", "y = 4x + 3", "y = 2x + 7"], ans: "y = 2x + 3", title: "RETTA DA DUE PUNTI", alg: ["1. m = (7-3)/(2-0) = 2", "2. y = 2x + 3."], dsm: ["Tabella con i punti e regressione y1 ~ mx1 + b."], gType: "line" },
+          { id: "ALG-06", type: "spr", q: "Se 5x - 3 > 17, qual è il minimo valore INTERO di x?", ans: "5", title: "DISEQUAZIONE", alg: ["1. 5x > 20 => x > 4", "2. Il primo intero è 5."], dsm: ["Disegna 5x - 3 > 17. Minimo intero = 5."], gType: "line" },
+          { id: "ALG-07", type: "mcq", q: "Per quale valore di k il sistema non ha soluzioni: 2x - 4y = 8 e 3x - ky = 15?", options: ["4", "6", "8", "-6"], ans: "6", title: "SISTEMA IMPOSSIBILE", alg: ["1. Pendenze identiche: 2/3 = -4/(-k)", "2. 2k = 12 => k = 6."], dsm: ["Rette parallele per k = 6."], gType: "system" },
+          { id: "ALG-08", type: "mcq", q: "Se f(x) = 3x - 5 e f(2a) = 19, qual è il valore di a?", options: ["2", "4", "6", "8"], ans: "4", title: "FUNZIONE", alg: ["1. 6a - 5 = 19", "2. 6a = 24 => a = 4."], dsm: ["f(x) = 3x - 5, poi risolvi f(2x) = 19."], gType: "line" },
+          { id: "ALG-09", type: "spr", q: "Se 3/(x + 2) = 1/(x - 4), qual è il valore di x?", ans: "7", title: "EQUAZIONE FRATTA", alg: ["1. 3(x - 4) = x + 2", "2. 2x = 14 => x = 7."], dsm: ["Intersezione a x = 7."], gType: "line" },
+          { id: "ALG-10", type: "mcq", q: "Se { y = 2x + b, y = -1/2 x + 4 } si intersecano su y = 0, quanto vale b?", options: ["-16", "-8", "8", "16"], ans: "-16", title: "INTERSEZIONE ASSI", alg: ["1. 0 = -0.5x + 4 => x = 8", "2. 0 = 2(8) + b => b = -16."], dsm: ["Zero su (8, 0), quindi b = -16."], gType: "system" },
+          { id: "ALG-11", type: "spr", q: "Se |2x - 6| = 14 e x > 0, qual è x?", ans: "10", title: "VALORE ASSOLUTO", alg: ["1. 2x - 6 = 14 => 2x = 20 => x = 10."], dsm: ["Intersezione positiva di y = |2x - 6| con y = 14."], gType: "line" },
+          { id: "ALG-12", type: "mcq", q: "La perpendicolare a 3x + 6y = 12 ha pendenza:", options: ["2", "-1/2", "-2", "1/2"], ans: "2", title: "PERPENDICOLARITÀ", alg: ["1. m1 = -1/2", "2. m_perp = -1/(-1/2) = 2."], dsm: ["Antireciproco di -1/2 è 2."], gType: "line" },
+          { id: "ALG-13", type: "spr", q: "Se ax + 3y = 9 e 4x + by = 18 hanno infinite soluzioni, quanto vale a*b?", ans: "12", title: "INFINITE SOLUZIONI", alg: ["1. Rapporto 1/2 => a = 2, b = 6", "2. a*b = 12."], dsm: ["Equazioni coincidenti."], gType: "system" },
+          { id: "ALG-14", type: "mcq", q: "Se ax + 5 = 2(x + 2.5) per ogni x, quanti valori ha a?", options: ["Uno solo (a = 2)", "Infiniti", "Nessuno", "Due"], ans: "Uno solo (a = 2)", title: "IDENTITÀ", alg: ["1. ax + 5 = 2x + 5", "2. a = 2."], dsm: ["Coefficienti identici."], gType: "line" },
+          { id: "ALG-15", type: "spr", q: "Massimo intero x che soddisfa 3x - 5 < 16 e 2x + 4 ≥ 6?", ans: "6", title: "SISTEMA DISEQUAZIONI", alg: ["1. 1 ≤ x < 7", "2. Massimo intero = 6."], dsm: ["Intervallo [1, 7). Intero max = 6."], gType: "line" }
+        ],
+        set2: [
+          { id: "ALG-01-B", type: "mcq", q: "Se 4x - 5 = 19, qual è il valore di x?", options: ["4", "6", "8", "12"], ans: "6", title: "EQUAZIONE LINEARE BASE", alg: ["1. 4x = 24", "2. x = 6."], dsm: ["Digita 4x - 5 = 19. x = 6."], gType: "line" },
+          { id: "ALG-02-B", type: "mcq", q: "Qual è la pendenza della retta 2x + 5y = 20?", options: ["-2/5", "2/5", "-5/2", "4"], ans: "-2/5", title: "FORMA IMPLICITA RETTA", alg: ["1. 5y = -2x + 20", "2. y = -2/5 x + 4 => m = -2/5."], dsm: ["m = -a/b = -2/5."], gType: "line" },
+          { id: "ALG-03-B", type: "spr", q: "Se 3(2x + 1) = 27, qual è il valore di x?", ans: "4", title: "EQUAZIONE DI PRIMO GRADO", alg: ["1. 2x + 1 = 9", "2. 2x = 8 => x = 4."], dsm: ["Digita l'equazione: retta su x = 4."], gType: "line" },
+          { id: "ALG-04-B", type: "mcq", q: "Se x + 2y = 8 e 3x - 2y = 8, qual è il valore di x?", options: ["2", "4", "6", "8"], ans: "4", title: "SISTEMA PER RIDUZIONE", alg: ["1. Somma: 4x = 16", "2. x = 4."], dsm: ["Intersezione a (4, 2). x = 4."], gType: "system" },
+          { id: "ALG-05-B", type: "mcq", q: "La retta passa per (1, 5) e (3, 11). Qual è l'intercetta y?", options: ["2", "3", "5", "1"], ans: "2", title: "INTERCETTA Q", alg: ["1. m = (11-5)/(3-1) = 3", "2. y - 5 = 3(x - 1) => y = 3x + 2."], dsm: ["Intercetta q = 2."], gType: "line" },
+          { id: "ALG-06-B", type: "spr", q: "Se 7 - 2x ≤ 1, qual è il MINIMO valore reale di x?", ans: "3", title: "DISEQUAZIONE CON SEGNO MENO", alg: ["1. -2x ≤ -6", "2. x ≥ 3."], dsm: ["Inversione verso disequazione: x >= 3."], gType: "line" },
+          { id: "ALG-07-B", type: "mcq", q: "Per quale k il sistema { 4x + 6y = 12, kx + 9y = 10 } non ha soluzioni?", options: ["6", "4", "9", "12"], ans: "6", title: "PARALLELISMO FRA RETTE", alg: ["1. 4/k = 6/9 = 2/3", "2. 2k = 12 => k = 6."], dsm: ["k = 6 rende le rette parallele."], gType: "system" },
+          { id: "ALG-08-B", type: "mcq", q: "Se h(x) = 5 - 2x e h(k) = -11, qual è k?", options: ["6", "8", "-8", "3"], ans: "8", title: "FUNZIONE LINEARE", alg: ["1. 5 - 2k = -11", "2. -2k = -16 => k = 8."], dsm: ["Risolvi 5 - 2x = -11."], gType: "line" },
+          { id: "ALG-09-B", type: "spr", q: "Se 5/(x - 1) = 2/(x - 4), qual è x?", ans: "6", title: "EQUAZIONE RAZIONALE", alg: ["1. 5(x - 4) = 2(x - 1)", "2. 5x - 20 = 2x - 2 => 3x = 18 => x = 6."], dsm: ["Intersezione su x = 6."], gType: "line" },
+          { id: "ALG-10-B", type: "mcq", q: "Due rette parallele hanno equazioni y = mx + 4 e 2x - 6y = 5. Quanto vale m?", options: ["1/3", "3", "-1/3", "-3"], ans: "1/3", title: "CONDIZIONE PARALLELISMO", alg: ["1. 6y = 2x - 5 => y = 1/3 x - 5/6", "2. m = 1/3."], dsm: ["m = 1/3."], gType: "line" },
+          { id: "ALG-11-B", type: "spr", q: "Se |3x - 9| = 12 e x < 0, qual è il valore di x?", ans: "-1", title: "VALORE ASSOLUTO NEGATIVO", alg: ["1. 3x - 9 = -12", "2. 3x = -3 => x = -1."], dsm: ["Ramo sinistro del grafico: x = -1."], gType: "line" },
+          { id: "ALG-12-B", type: "mcq", q: "La perpendicolare alla retta y = 3/4 x - 2 ha pendenza:", options: ["-4/3", "4/3", "-3/4", "3/4"], ans: "-4/3", title: "PENDENZA ANTIRECIPROCA", alg: ["1. m_perp = -1 / (3/4) = -4/3."], dsm: ["m = -4/3."], gType: "line" },
+          { id: "ALG-13-B", type: "spr", q: "Se 2x + ky = 8 e 6x + 15y = 24 hanno infinite soluzioni, quanto vale k?", ans: "5", title: "SISTEMA COINCIDENTE", alg: ["1. 2/6 = k/15 => 1/3 = k/15", "2. k = 5."], dsm: ["k = 5."], gType: "system" },
+          { id: "ALG-14-B", type: "mcq", q: "Qual è il valore di b se la retta y = 3x + b passa per (4, 7)?", options: ["-5", "5", "-19", "19"], ans: "-5", title: "PASSAGGIO PER UN PUNTO", alg: ["1. 7 = 3(4) + b", "2. 7 = 12 + b => b = -5."], dsm: ["7 - 12 = -5."], gType: "line" },
+          { id: "ALG-15-B", type: "spr", q: "Se 4x - 2 < 14 e x + 3 > 5, quanti INTERI soddisfano entrambe?", ans: "1", title: "CONTEGGIO SOLUZIONI INTERE", alg: ["1. 4x < 16 => x < 4", "2. x > 2", "3. Intervallo (2, 4) => solo x = 3 (1 intero)."], dsm: ["Un solo intero compreso: 3."], gType: "line" }
+        ]
+      },
+      advanced: {
+        set1: [
+          { id: "ADV-01", type: "mcq", q: "Quali sono le radici di x² - 9 = 0?", options: ["x = ±3", "x = 3", "x = 9", "x = ±9"], ans: "x = ±3", title: "DIFFERENZA DI QUADRATI", alg: ["1. (x - 3)(x + 3) = 0", "2. x = ±3."], dsm: ["Intersezioni x = -3 e x = 3."], gType: "parabola" },
+          { id: "ADV-02", type: "mcq", q: "Semplifica l'espressione (x³)(x⁵).", options: ["x⁸", "x¹⁵", "x²", "2x⁸"], ans: "x⁸", title: "POTENZE", alg: ["1. Somma esponenti: 3 + 5 = 8."], dsm: ["x^(3+5) = x^8."], gType: "parabola" },
+          { id: "ADV-03", type: "spr", q: "Se f(x) = x² - 4x + 7, qual è f(3)?", ans: "4", title: "VALUTAZIONE", alg: ["1. 3² - 4(3) + 7 = 9 - 12 + 7 = 4."], dsm: ["f(3) = 4."], gType: "parabola" },
+          { id: "ADV-04", type: "spr", q: "Per quale x la parabola f(x) = x² - 6x + 8 ha il minimo?", ans: "3", title: "VERTICE PARABOLA", alg: ["1. x = -b / (2a)", "2. x = -(-6)/2 = 3."], dsm: ["Minimo a (3, -1)."], gType: "parabola" },
+          { id: "ADV-05", type: "mcq", q: "Discriminante di 2x² - 4x + 5 = 0:", options: ["-24", "24", "-56", "16"], ans: "-24", title: "DELTA", alg: ["1. Δ = b² - 4ac = 16 - 40 = -24."], dsm: ["Nessuna radice reale."], gType: "parabola" },
+          { id: "ADV-06", type: "mcq", q: "Forma equivalente di (2x + 3)²:", options: ["4x² + 12x + 9", "4x² + 9", "4x² + 6x + 9", "2x² + 12x + 9"], ans: "4x² + 12x + 9", title: "BINOMIO", alg: ["1. a² + 2ab + b² = 4x² + 12x + 9."], dsm: ["Sviluppo algebrico."], gType: "parabola" },
+          { id: "ADV-07", type: "spr", q: "Se x² + 8x + k = 0 ha una sola soluzione, quanto vale k?", ans: "16", title: "DELTA = 0", alg: ["1. 64 - 4k = 0 => k = 16."], dsm: ["k = (8/2)² = 16."], gType: "parabola" },
+          { id: "ADV-08", type: "mcq", q: "Somma delle radici di 3x² - 12x + 7 = 0:", options: ["4", "-4", "7/3", "12"], ans: "4", title: "FORMULE DI VIETE", alg: ["1. -b / a = 12 / 3 = 4."], dsm: ["Somma radici = -b/a = 4."], gType: "parabola" },
+          { id: "ADV-09", type: "spr", q: "Se √(2x + 5) = 7, qual è x?", ans: "22", title: "RADICALI", alg: ["1. 2x + 5 = 49 => 2x = 44 => x = 22."], dsm: ["x = 22."], gType: "parabola" },
+          { id: "ADV-10", type: "mcq", q: "Valore minimo di g(x) = (x - 4)² + 11:", options: ["11", "4", "-11", "-4"], ans: "11", title: "FORMA VERTICE", alg: ["1. Vertice in (4, 11) => Minimo = 11."], dsm: ["Ordinata vertice = 11."], gType: "parabola" },
+          { id: "ADV-11", type: "spr", q: "Se (x - 2) divide x³ - 3x² + kx + 6, quanto vale k?", ans: "-1", title: "TEOREMA DEL RESTO", alg: ["1. 8 - 12 + 2k + 6 = 0 => 2k = -2 => k = -1."], dsm: ["k = -1."], gType: "parabola" },
+          { id: "ADV-12", type: "mcq", q: "Se 2^(3x - 1) = 32, qual è x?", options: ["2", "3", "5", "1/2"], ans: "2", title: "ESPONENZIALI", alg: ["1. 3x - 1 = 5 => 3x = 6 => x = 2."], dsm: ["x = 2."], gType: "parabola" },
+          { id: "ADV-13", type: "spr", q: "Raggio della circonferenza x² + y² - 6x + 8y = 0:", ans: "5", title: "CIRCONFERENZA", alg: ["1. (x - 3)² + (y + 4)² = 25 => r = 5."], dsm: ["r = 5."], gType: "circle" },
+          { id: "ADV-14", type: "mcq", q: "Numero di soluzioni del sistema { y = x² + 4, y = 2x - 1 }:", options: ["0", "1", "2", "Infinite"], ans: "0", title: "INTERSEZIONE", alg: ["1. x² - 2x + 5 = 0, Δ = -16 < 0 => 0 soluzioni."], dsm: ["Nessun punto di contatto."], gType: "parabola" },
+          { id: "ADV-15", type: "spr", q: "Se f(x) = a(x - 2)² + 8 e passa per (0, 4), quanto vale a?", ans: "-1", title: "COEFFICIENTE A", alg: ["1. 4a + 8 = 4 => 4a = -4 => a = -1."], dsm: ["a = -1."], gType: "parabola" }
+        ],
+        set2: [
+          { id: "ADV-01-B", type: "mcq", q: "Quali sono le radici di x² - 16 = 0?", options: ["x = ±4", "x = 4", "x = 16", "x = ±16"], ans: "x = ±4", title: "DIFFERENZA DI QUADRATI", alg: ["1. (x - 4)(x + 4) = 0", "2. x = ±4."], dsm: ["x = -4 e x = 4."], gType: "parabola" },
+          { id: "ADV-02-B", type: "spr", q: "Se g(x) = 2x² - 3x + 1, qual è il valore di g(-2)?", ans: "15", title: "VALUTAZIONE", alg: ["1. 2(-2)² - 3(-2) + 1 = 8 + 6 + 1 = 15."], dsm: ["g(-2) = 15."], gType: "parabola" },
+          { id: "ADV-03-B", type: "mcq", q: "Semplifica: (2x³)²", options: ["4x⁶", "2x⁶", "4x⁵", "2x⁵"], ans: "4x⁶", title: "POTENZA DI POTENZA", alg: ["1. 2² * (x³)² = 4x⁶."], dsm: ["4x^6."], gType: "parabola" },
+          { id: "ADV-04-B", type: "spr", q: "Per quale x la parabola y = 2x² - 8x + 5 raggiunge il minimo?", ans: "2", title: "MINIMO QUADRATICA", alg: ["1. x = -(-8) / (2*2) = 8 / 4 = 2."], dsm: ["x = 2."], gType: "parabola" },
+          { id: "ADV-05-B", type: "mcq", q: "Prodotto delle radici di 2x² - 7x + 12 = 0:", options: ["6", "12", "-6", "7/2"], ans: "6", title: "FORMULA DI VIETE (PRODOTTO)", alg: ["1. Prodotto = c / a = 12 / 2 = 6."], dsm: ["c/a = 6."], gType: "parabola" },
+          { id: "ADV-06-B", type: "spr", q: "Se x² + 10x + c è un quadrato perfetto, quanto vale c?", ans: "25", title: "COMPLETAMENTO QUADRATO", alg: ["1. c = (10/2)² = 25."], dsm: ["c = 25."], gType: "parabola" },
+          { id: "ADV-07-B", type: "mcq", q: "Risolvi: √(3x + 4) = 5", options: ["7", "9", "25", "3"], ans: "7", title: "EQUAZIONE CON RADICE", alg: ["1. 3x + 4 = 25 => 3x = 21 => x = 7."], dsm: ["x = 7."], gType: "parabola" },
+          { id: "ADV-08-B", type: "spr", q: "Se 3^(2x - 1) = 27, qual è x?", ans: "2", title: "ESPONENZIALI", alg: ["1. 2x - 1 = 3 => 2x = 4 => x = 2."], dsm: ["x = 2."], gType: "parabola" },
+          { id: "ADV-09-B", type: "mcq", q: "Qual è il massimo della funzione f(x) = -(x + 3)² + 9?", options: ["9", "-3", "3", "-9"], ans: "9", title: "MASSIMO ASSOLUTO", alg: ["1. Vertice in (-3, 9) => Valore massimo = 9."], dsm: ["y = 9."], gType: "parabola" },
+          { id: "ADV-10-B", type: "spr", q: "Se f(x) = x² - 5x + 6, qual è la distanza tra le due radici?", ans: "1", title: "DISTANZA TRA RADICI", alg: ["1. Radici: x = 2 e x = 3", "2. Distanza = 3 - 2 = 1."], dsm: ["Distanza = 1."], gType: "parabola" },
+          { id: "ADV-11-B", type: "mcq", q: "Resto della divisione di (x² + 5x + 7) per (x - 1):", options: ["13", "7", "1", "3"], ans: "13", title: "RESTO POLINOMIALE", alg: ["1. P(1) = 1 + 5 + 7 = 13."], dsm: ["P(1) = 13."], gType: "parabola" },
+          { id: "ADV-12-B", type: "spr", q: "Se x² + y² = 36, qual è l'area del cerchio divisa per π?", ans: "36", title: "AREA DA EQUAZIONE", alg: ["1. r² = 36", "2. Area = π r² = 36π => Diviso π fa 36."], dsm: ["36."], gType: "circle" },
+          { id: "ADV-13-B", type: "mcq", q: "Per quanti valori x si intersecano y = x² e y = 4?", options: ["2", "1", "0", "4"], ans: "2", title: "INTERSEZIONE", alg: ["1. x² = 4 => x = ±2 (2 valori)."], dsm: ["Due punti."], gType: "parabola" },
+          { id: "ADV-14-B", type: "spr", q: "Se (x + 3)(x - 5) = -15, qual è la soluzione positiva per x?", ans: "2", title: "EQUAZIONE DI SECONDO GRADO", alg: ["1. x² - 2x - 15 = -15 => x² - 2x = 0", "2. x(x - 2) = 0 => soluzione positiva = 2."], dsm: ["x = 2."], gType: "parabola" },
+          { id: "ADV-15-B", type: "mcq", q: "Qual è l'asintoto orizzontale di y = (3x + 1) / (x - 2)?", options: ["y = 3", "x = 2", "y = 0", "y = -1/2"], ans: "y = 3", title: "ASINTOTO ORIZZONTALE", alg: ["1. Rapporto coefficienti di grado max: 3 / 1 = 3."], dsm: ["y = 3."], gType: "line" }
+        ]
+      },
+      psda: {
+        set1: [
+          { id: "PSD-01", type: "mcq", q: "Il 30% di 150 è:", options: ["45", "50", "35", "60"], ans: "45", title: "PERCENTUALE BASE", alg: ["1. 0.30 * 150 = 45."], dsm: ["0.30 * 150 = 45."], gType: "stat" },
+          { id: "PSD-02", type: "mcq", q: "Media di 4, 8, 12, 16:", options: ["10", "8", "12", "14"], ans: "10", title: "MEDIA ARITMETICA", alg: ["1. Somma 40 / 4 = 10."], dsm: ["mean([4,8,12,16]) = 10."], gType: "stat" },
+          { id: "PSD-03", type: "spr", q: "Prezzo scontato del 25% su $80:", ans: "60", title: "SCONTO", alg: ["1. 80 * 0.75 = $60."], dsm: ["60."], gType: "stat" },
+          { id: "PSD-04", type: "mcq", q: "Miglia a 60 mph in 2h 30m:", options: ["150", "120", "140", "180"], ans: "150", title: "VELOCITÀ", alg: ["1. 60 * 2.5 = 150."], dsm: ["150."], gType: "stat" },
+          { id: "PSD-05", type: "spr", q: "Su 30 studenti con rapporto maschi:femmine 2:3, quante femmine?", ans: "18", title: "RAPPORTI", alg: ["1. 30 * (3/5) = 18."], dsm: ["18."], gType: "stat" },
+          { id: "PSD-06", type: "mcq", q: "Mediana di: 3, 7, 9, 15, 18, 21, 25:", options: ["15", "12", "18", "9"], ans: "15", title: "MEDIANA", alg: ["1. Valore centrale = 15."], dsm: ["15."], gType: "stat" },
+          { id: "PSD-07", type: "spr", q: "Aumento percentuale da 200 a 260:", ans: "30", title: "INCREMENTO %", alg: ["1. (60/200)*100 = 30%."], dsm: ["30."], gType: "stat" },
+          { id: "PSD-08", type: "mcq", q: "Misura non influenzata da outliers:", options: ["Mediana", "Media", "Range", "Deviazione Standard"], ans: "Mediana", title: "ROBUSTEZZA", alg: ["1. La mediana è robusta."], dsm: ["Mediana."], gType: "stat" },
+          { id: "PSD-09", type: "spr", q: "Se P(A) = 0.35, qual è P(non A) in %?", ans: "65", title: "COMPLEMENTARE", alg: ["1. (1 - 0.35)*100 = 65%."], dsm: ["65."], gType: "stat" },
+          { id: "PSD-10", type: "mcq", q: "Aumento % annuo in N(t) = 50(1.08)^t:", options: ["8%", "1.08%", "80%", "50%"], ans: "8%", title: "CRESCITA ESPONENZIALE", alg: ["1. 1 + r = 1.08 => r = 8%."], dsm: ["8%."], gType: "stat" },
+          { id: "PSD-11", type: "spr", q: "Su 400 persone, 120 votano Sì. Percentuale:", ans: "30", title: "PERCENTUALE", alg: ["1. 120/400 = 30%."], dsm: ["30."], gType: "stat" },
+          { id: "PSD-12", type: "mcq", q: "Raddoppiando tutti i dati, la deviazione standard:", options: ["Raddoppia", "Resta uguale", "Quadruplica", "Dimezza"], ans: "Raddoppia", title: "DISPERSIONE", alg: ["1. SD(2X) = 2*SD(X)."], dsm: ["Raddoppia."], gType: "stat" },
+          { id: "PSD-13", type: "spr", q: "-20% seguito da +30%. Variazione netta %:", ans: "4", title: "PERCENTUALI SUCCESSIVE", alg: ["1. 0.8 * 1.3 = 1.04 => +4%."], dsm: ["4."], gType: "stat" },
+          { id: "PSD-14", type: "mcq", q: "Un test controllato randomizzato permette di stabilire:", options: ["Causalità", "Zero errori", "Basso costo", "Certezza"], ans: "Causalità", title: "METODOLOGIA", alg: ["1. Randomizzazione => causa-effetto."], dsm: ["Causalità."], gType: "stat" },
+          { id: "PSD-15", type: "spr", q: "Media di 5 numeri è 18. Aggiunto 30, nuova media:", ans: "20", title: "MEDIA PONDERATA", alg: ["1. (5*18 + 30) / 6 = 120 / 6 = 20."], dsm: ["20."], gType: "stat" }
+        ],
+        set2: [
+          { id: "PSD-01-B", type: "mcq", q: "Il 15% di 240 è:", options: ["36", "30", "42", "24"], ans: "36", title: "PERCENTUALE BASE", alg: ["1. 0.15 * 240 = 36."], dsm: ["36."], gType: "stat" },
+          { id: "PSD-02-B", type: "spr", q: "Un treno percorre 180 km a 90 km/h. Quante ore impiega?", ans: "2", title: "TEMPO DI VIAGGIO", alg: ["1. 180 / 90 = 2 ore."], dsm: ["2."], gType: "stat" },
+          { id: "PSD-03-B", type: "mcq", q: "Media dei valori 10, 20, 30, 40, 50:", options: ["30", "25", "35", "20"], ans: "30", title: "MEDIA SIMMETRICA", alg: ["1. Valore medio = 30."], dsm: ["30."], gType: "stat" },
+          { id: "PSD-04-B", type: "spr", q: "Un capo da $50 aumenta del 20%. Nuovo prezzo:", ans: "60", title: "AUMENTO %", alg: ["1. 50 * 1.20 = $60."], dsm: ["60."], gType: "stat" },
+          { id: "PSD-05-B", type: "mcq", q: "Rapporto tra 15 e 45 in forma ridotta:", options: ["1:3", "1:2", "3:1", "1:4"], ans: "1:3", title: "SEMPLIFICAZIONE", alg: ["1. 15/45 = 1/3."], dsm: ["1:3."], gType: "stat" },
+          { id: "PSD-06-B", type: "spr", q: "Mediana dei numeri 2, 8, 14, 20:", ans: "11", title: "MEDIANA NUMERO PARI", alg: ["1. (8 + 14) / 2 = 11."], dsm: ["11."], gType: "stat" },
+          { id: "PSD-07-B", type: "mcq", q: "Tasso di decadimento annuo in P(t) = 100(0.85)^t:", options: ["15%", "85%", "0.85%", "10%"], ans: "15%", title: "DECADIMENTO ESPONENZIALE", alg: ["1. 1 - r = 0.85 => r = 15%."], dsm: ["15%."], gType: "stat" },
+          { id: "PSD-08-B", type: "spr", q: "Se lanci un dado equo a 6 facce, la probabilità di un numero pari in % è:", ans: "50", title: "PROBABILITÀ CLASSICA", alg: ["1. 3 facce su 6 = 50%."], dsm: ["50."], gType: "stat" },
+          { id: "PSD-09-B", type: "mcq", q: "Se a tutti i dati aggiungi 5, cosa succede alla deviazione standard?", options: ["Resta invariata", "Aumenta di 5", "Moltiplica per 5", "Diventa 0"], ans: "Resta invariata", title: "TRASLAZIONE DEI DATI", alg: ["1. La dispersione non cambia sommando una costante."], dsm: ["Invariata."], gType: "stat" },
+          { id: "PSD-10-B", type: "spr", q: "Un capitale passa da $500 a $650. Incremento %:", ans: "30", title: "INCREMENTO %", alg: ["1. (150 / 500) * 100 = 30%."], dsm: ["30."], gType: "stat" },
+          { id: "PSD-11-B", type: "mcq", q: "In un grafico a dispersione con retta di regressione discendente, la correlazione è:", options: ["Negativa", "Positiva", "Nulla", "Costante"], ans: "Negativa", title: "CORRELAZIONE LINEARE", alg: ["1. Pendenza negativa => r < 0."], dsm: ["Negativa."], gType: "stat" },
+          { id: "PSD-12-B", type: "spr", q: "Su 800 persone il 45% ha un cane. Quante persone?", ans: "360", title: "CONTEGGIO PROPORZIONE", alg: ["1. 0.45 * 800 = 360."], dsm: ["360."], gType: "stat" },
+          { id: "PSD-13-B", type: "mcq", q: "Un prezzo scende del 10% e poi sale del 10%. Rispetto all'inizio è:", options: ["Minore (-1%)", "Uguale", "Maggiore (+1%)", "Minore (-2%)"], ans: "Minore (-1%)", title: "TRAP PERCENTUALE", alg: ["1. 0.90 * 1.10 = 0.99 (-1%)."], dsm: ["-1%."], gType: "stat" },
+          { id: "PSD-14-B", type: "spr", q: "La media di 4 numeri è 25. La loro somma vale:", ans: "100", title: "SOMMA DA MEDIA", alg: ["1. 4 * 25 = 100."], dsm: ["100."], gType: "stat" },
+          { id: "PSD-15-B", type: "mcq", q: "Il campionamento casuale garantisce soprattutto:", options: ["Rappresentatività della popolazione", "Certezza matematica", "Assenza di scarto", "Causalità"], ans: "Rappresentatività della popolazione", title: "CAMPIONAMENTO", alg: ["1. Riduce i bias di selezione."], dsm: ["Rappresentatività."], gType: "stat" }
+        ]
+      },
+      geometry: {
+        set1: [
+          { id: "GEO-01", type: "mcq", q: "Area di un rettangolo con base 8 e altezza 5:", options: ["40", "26", "20", "13"], ans: "40", title: "AREA RETTANGOLO", alg: ["1. 8 * 5 = 40."], dsm: ["40."], gType: "triangle" },
+          { id: "GEO-02", type: "spr", q: "Ipotenusa di un triangolo con cateti 3 e 4:", ans: "5", title: "TERNA PITAGORICA", alg: ["1. √(9 + 16) = 5."], dsm: ["5."], gType: "triangle" },
+          { id: "GEO-03", type: "mcq", q: "Somma angoli interni di un triangolo:", options: ["180°", "360°", "90°", "270°"], ans: "180°", title: "ANGOLI TRIANGOLO", alg: ["1. Sempre 180°."], dsm: ["180°."], gType: "triangle" },
+          { id: "GEO-04", type: "mcq", q: "Circonferenza di un cerchio con raggio 6:", options: ["12π", "36π", "6π", "24π"], ans: "12π", title: "CIRCONFERENZA", alg: ["1. 2π(6) = 12π."], dsm: ["12*pi."], gType: "circle" },
+          { id: "GEO-05", type: "spr", q: "Triangolo con base 10 e area 35. Altezza:", ans: "7", title: "ALTEZZA TRIANGOLO", alg: ["1. (10 * h) / 2 = 35 => h = 7."], dsm: ["7."], gType: "triangle" },
+          { id: "GEO-06", type: "mcq", q: "In triangolo 30-60-90 con ipotenusa 10, cateto opposto a 30°:", options: ["5", "5√3", "10√3", "2.5"], ans: "5", title: "TRIANGOLO 30-60-90", alg: ["1. 10 / 2 = 5."], dsm: ["5."], gType: "triangle" },
+          { id: "GEO-07", type: "spr", q: "Se sin(x°) = cos(40°), qual è x?", ans: "50", title: "COMPLEMENTARI", alg: ["1. 90 - 40 = 50."], dsm: ["50."], gType: "triangle" },
+          { id: "GEO-08", type: "mcq", q: "Volume cilindro con r = 3 e h = 10:", options: ["90π", "30π", "60π", "180π"], ans: "90π", title: "VOLUME CILINDRO", alg: ["1. π(3)²(10) = 90π."], dsm: ["90*pi."], gType: "circle" },
+          { id: "GEO-09", type: "spr", q: "Rapporto aree per triangoli con lati in rapporto 1:3:", ans: "9", title: "SIMILITUDINE", alg: ["1. 3² = 9."], dsm: ["9."], gType: "triangle" },
+          { id: "GEO-10", type: "mcq", q: "Centro e raggio di (x - 2)² + (y + 5)² = 49:", options: ["Centro (2, -5), r = 7", "Centro (-2, 5), r = 7", "Centro (2, -5), r = 49", "Centro (-2, 5), r = 49"], ans: "Centro (2, -5), r = 7", title: "CERCHIO", alg: ["1. (h, k) = (2, -5), r = √49 = 7."], dsm: ["(2, -5), r = 7."], gType: "circle" },
+          { id: "GEO-11", type: "spr", q: "Area settore a 60° con raggio 6 divisa per π:", ans: "6", title: "SETTORE CIRCOLARE", alg: ["1. 36π * (60/360) = 6π => 6."], dsm: ["6."], gType: "circle" },
+          { id: "GEO-12", type: "mcq", q: "Se tan(θ) = 3/4, quanto vale cos(θ)?", options: ["4/5", "3/5", "5/4", "5/3"], ans: "4/5", title: "TRIGONOMETRIA", alg: ["1. Cateto adiacente 4 / Ipotenusa 5 = 4/5."], dsm: ["4/5."], gType: "triangle" },
+          { id: "GEO-13", type: "spr", q: "Raggio di una sfera con volume 36π:", ans: "3", title: "VOLUME SFERA", alg: ["1. (4/3)r³ = 36 => r³ = 27 => r = 3."], dsm: ["3."], gType: "circle" },
+          { id: "GEO-14", type: "mcq", q: "Triangolo con lati 7, 24, 25 è:", options: ["Rettangolo", "Acutangolo", "Ottusangolo", "Equilatero"], ans: "Rettangolo", title: "PITAGORA", alg: ["1. 49 + 576 = 625 = 25² => Rettangolo."], dsm: ["Rettangolo."], gType: "triangle" },
+          { id: "GEO-15", type: "spr", q: "Arco di 5π su raggio 10. Angolo in gradi:", ans: "90", title: "ARCO CIRCOLARE", alg: ["1. (5π / 20π)*360 = 90°."], dsm: ["90."], gType: "circle" }
+        ],
+        set2: [
+          { id: "GEO-01-B", type: "mcq", q: "Perimetro di un quadrato con area 49:", options: ["28", "14", "49", "21"], ans: "28", title: "QUADRATO", alg: ["1. Lato = √49 = 7", "2. Perimetro = 4 * 7 = 28."], dsm: ["28."], gType: "triangle" },
+          { id: "GEO-02-B", type: "spr", q: "Cateto opposto in triangolo 45-45-90 con cateto adiacente = 8:", ans: "8", title: "TRIANGOLO 45-45-90", alg: ["1. Triangolo isoscele => cateti uguali = 8."], dsm: ["8."], gType: "triangle" },
+          { id: "GEO-03-B", type: "mcq", q: "Area di un cerchio con diametro 10:", options: ["25π", "100π", "10π", "50π"], ans: "25π", title: "AREA CERCHIO", alg: ["1. r = 5 => Area = π(5)² = 25π."], dsm: ["25*pi."], gType: "circle" },
+          { id: "GEO-04-B", type: "spr", q: "Ipotenusa di triangolo rettangolo con cateti 5 e 12:", ans: "13", title: "TERNA 5-12-13", alg: ["1. √(25 + 144) = √169 = 13."], dsm: ["13."], gType: "triangle" },
+          { id: "GEO-05-B", type: "mcq", q: "Volume di un prisma a base rettangolare con dimensioni 2, 4, 5:", options: ["40", "20", "22", "60"], ans: "40", title: "PARALLELEPIPEDO", alg: ["1. 2 * 4 * 5 = 40."], dsm: ["40."], gType: "triangle" },
+          { id: "GEO-06-B", type: "spr", q: "Se cos(x°) = sin(25°), qual è x?", ans: "65", title: "ANGOLI COMPLEMENTARI", alg: ["1. 90 - 25 = 65."], dsm: ["65."], gType: "triangle" },
+          { id: "GEO-07-B", type: "mcq", q: "In triangolo 30-60-90 con cateto corto 4, l'ipotenusa vale:", options: ["8", "4√3", "16", "2"], ans: "8", title: "IPOTENUSA 30-60-90", alg: ["1. 2 * 4 = 8."], dsm: ["8."], gType: "triangle" },
+          { id: "GEO-08-B", type: "spr", q: "Lunghezza della circonferenza con diametro 14 divisa per π:", ans: "14", title: "DIAMETRO E CIRCONFERENZA", alg: ["1. C = π d = 14π => diviso π fa 14."], dsm: ["14."], gType: "circle" },
+          { id: "GEO-09-B", type: "mcq", q: "Un cono ha r = 3 e h = 4. Volume diviso per π:", options: ["12", "36", "16", "4"], ans: "12", title: "VOLUME CONO", alg: ["1. (1/3)π r² h = (1/3)π (9)(4) = 12π => 12."], dsm: ["12."], gType: "circle" },
+          { id: "GEO-10-B", type: "spr", q: "Raggio della circonferenza (x + 1)² + (y - 4)² = 81:", ans: "9", title: "RAGGIO DA EQUAZIONE", alg: ["1. √81 = 9."], dsm: ["9."], gType: "circle" },
+          { id: "GEO-11-B", type: "mcq", q: "Se sin(θ) = 5/13 in un triangolo rettangolo, quanto vale tan(θ)?", options: ["5/12", "12/5", "12/13", "13/5"], ans: "5/12", title: "TANGENTE DA SENO", alg: ["1. Adiacente = √(169 - 25) = 12 => tan = 5/12."], dsm: ["5/12."], gType: "triangle" },
+          { id: "GEO-12-B", type: "spr", q: "Area di un triangolo equilatero con lato 6 divisa per √3:", ans: "9", title: "TRIANGOLO EQUILATERO", alg: ["1. Area = (l²√3)/4 = (36√3)/4 = 9√3 => 9."], dsm: ["9."], gType: "triangle" },
+          { id: "GEO-13-B", type: "mcq", q: "Angolo giro in radianti:", options: ["2π", "π", "π/2", "4π"], ans: "2π", title: "RADIANTI", alg: ["1. 360° = 2π radianti."], dsm: ["2*pi."], gType: "circle" },
+          { id: "GEO-14-B", type: "spr", q: "Ipotenusa di un triangolo 45-45-90 con cateto 7 divisa per √2:", ans: "7", title: "IPOTENUSA NOTEVOLE", alg: ["1. Ipotenusa = 7√2 => diviso √2 fa 7."], dsm: ["7."], gType: "triangle" },
+          { id: "GEO-15-B", type: "mcq", q: "Superficie totale di un cubo di spigolo 3:", options: ["54", "27", "36", "18"], ans: "54", title: "AREA SUPERFICIALE CUBO", alg: ["1. 6 facce * (3)² = 6 * 9 = 54."], dsm: ["54."], gType: "triangle" }
+        ]
+      }
+    };
+
+    let currentCategory = 'algebra';
+    let currentSetKey = 'set1';
+    let currentIndex = 0;
+    let selectedOption = null;
+    let secondsSpent = 0;
+    let timerInterval = null;
+    let recoveryBox = [];
+    let isRetryingRecovery = false;
+    let activeRecoveryIndex = -1;
+
+    function getDifficultyLabel(idx) {
+      if (idx < 3) return "LIV. 1 (FOUNDATIONS)";
+      if (idx < 6) return "LIV. 2 (MEDIUM)";
+      if (idx < 9) return "LIV. 3 (INTERMEDIATE)";
+      if (idx < 12) return "LIV. 4 (HARD)";
+      return "LIV. 5 (IMPOSSIBLE / 800)";
+    }
+
+    function selectCategory(catKey) {
+      isRetryingRecovery = false;
+      currentCategory = catKey;
+      currentSetKey = 'set1';
+      currentIndex = 0;
+      
+      document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+      const catBtns = { 'algebra': 0, 'advanced': 1, 'psda': 2, 'geometry': 3 };
+      document.querySelectorAll('.category-btn')[catBtns[catKey]].classList.add('active');
+
+      const labels = {
+        'algebra': '🔵 HEART OF ALGEBRA',
+        'advanced': '🟣 ADVANCED MATH',
+        'psda': '🟢 PROBLEM SOLVING & DATA',
+        'geometry': '🟠 GEOMETRY & TRIG'
+      };
+      document.getElementById('category-badge').textContent = labels[catKey];
+      loadQuestion();
+    }
+
+    function startTimer() {
+      secondsSpent = 0;
+      clearInterval(timerInterval);
+      const timerEl = document.getElementById('pacing-timer');
+      const clockEl = document.getElementById('q-clock');
+
+      timerInterval = setInterval(() => {
+        secondsSpent++;
+        const mins = String(Math.floor(secondsSpent / 60)).padStart(2, '0');
+        const secs = String(secondsSpent % 60).padStart(2, '0');
+        clockEl.textContent = `${mins}:${secs}`;
+
+        if (secondsSpent > 95) timerEl.className = "pacing-timer pacing-danger";
+        else if (secondsSpent > 75) timerEl.className = "pacing-timer pacing-warn";
+        else timerEl.className = "pacing-timer pacing-normal";
+      }, 1000);
+    }
+
+    function getCurrentQuestion() {
+      if (isRetryingRecovery && activeRecoveryIndex >= 0 && recoveryBox[activeRecoveryIndex]) {
+        return recoveryBox[activeRecoveryIndex].qObj;
+      }
+      return questionSets[currentCategory][currentSetKey][currentIndex];
+    }
+
+    function loadQuestion() {
+      const q = getCurrentQuestion();
+
+      if (isRetryingRecovery) {
+        document.getElementById('progress-badge').textContent = `RECOVERY: ${q.id}`;
+        document.getElementById('difficulty-badge').textContent = "MODALITÀ RECUPERO";
+      } else {
+        document.getElementById('progress-badge').textContent = `QUESITO ${currentIndex + 1} / 15`;
+        document.getElementById('difficulty-badge').textContent = getDifficultyLabel(currentIndex);
+      }
+
+      document.getElementById('question-text').textContent = q.q;
+      document.getElementById('visual-solution-card').style.display = "none";
+      document.getElementById('submit-btn').style.display = "inline-flex";
+      document.getElementById('skip-btn').style.display = "inline-flex";
+      document.getElementById('next-btn').style.display = "none";
+      selectedOption = null;
+
+      const container = document.getElementById('answer-container');
+      container.innerHTML = "";
+
+      if (q.type === "mcq") {
+        const grid = document.createElement('div');
+        grid.className = "options-grid";
+        q.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = "btn-opt";
+          btn.innerHTML = `<span style="opacity:0.5; font-weight:700;">●</span> <span>${opt}</span>`;
+          btn.onclick = () => {
+            document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedOption = opt;
+          };
+          grid.appendChild(btn);
+        });
+        container.appendChild(grid);
+      } else {
+        const sprBox = document.createElement('div');
+        sprBox.className = "spr-box";
+        sprBox.innerHTML = `
+          <input type="text" class="spr-input" id="spr-val" placeholder="es. 5 oppure 7/2" autocomplete="off" />
+          <span class="spr-rules">• Inserisci numeri interi, decimali o frazioni.</span>
+        `;
+        container.appendChild(sprBox);
+      }
+
+      calculator.setBlank();
+      if (q.gType === "system") {
+        calculator.setExpression({ id: 'e1', latex: '2x + 3y = 12', color: '#38bdf8' });
+        calculator.setExpression({ id: 'e2', latex: '4x - y = 10', color: '#ef4444' });
+      } else if (q.gType === "parabola") {
+        calculator.setExpression({ id: 'p1', latex: 'y = x^2 - 6x + 8', color: '#38bdf8' });
+      }
+
+      startTimer();
+    }
+
+    function normalizeAnswer(val) {
+      if (!val) return "";
+      val = String(val).trim().replace(/\s+/g, '');
+      if (val.includes('/')) {
+        const parts = val.split('/');
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && Number(parts[1]) !== 0) {
+          return (Number(parts[0]) / Number(parts[1])).toFixed(4);
+        }
+      }
+      const num = Number(val);
+      return !isNaN(num) ? num.toFixed(4) : val.toLowerCase();
+    }
+
+    function submitAnswer() {
+      clearInterval(timerInterval);
+      const q = getCurrentQuestion();
+      let userAns = selectedOption;
+
+      if (q.type === "spr") {
+        const elem = document.getElementById('spr-val');
+        userAns = elem ? elem.value : null;
+      }
+
+      if (!userAns) {
+        alert("Inserisci o scegli una risposta. Se non la sai, premi 'Salta'.");
+        return;
+      }
+
+      const isCorrect = normalizeAnswer(userAns) === normalizeAnswer(q.ans);
+      showSolution(q, isCorrect, userAns);
+    }
+
+    function skipQuestion() {
+      clearInterval(timerInterval);
+      const q = getCurrentQuestion();
+      addToRecovery(q);
+      showSolution(q, false, "SALTATA");
+    }
+
+    function showSolution(q, isCorrect, userAns) {
+      const visualCard = document.getElementById('visual-solution-card');
+      const resultStatus = document.getElementById('result-status');
+
+      visualCard.style.display = "block";
+      document.getElementById('submit-btn').style.display = "none";
+      document.getElementById('skip-btn').style.display = "none";
+      document.getElementById('next-btn').style.display = "inline-flex";
+
+      if (userAns === "SALTATA") {
+        resultStatus.innerHTML = `<span style="color:var(--error)">⏭ Quesito Saltato! Registrato nel Recovery Box. Corretta: <strong>${q.ans}</strong></span>`;
+      } else if (isCorrect) {
+        resultStatus.innerHTML = `<span style="color:var(--success)">✔ Risposta Esatta! (${userAns})</span>`;
+        if (isRetryingRecovery) advanceRecovery(q.id);
+      } else {
+        resultStatus.innerHTML = `<span style="color:var(--error)">✖ Risposta Errata. Registrato nel Recovery Box. Corretta: <strong>${q.ans}</strong></span>`;
+        addToRecovery(q);
+      }
+
+      renderVisualSolutionCanvas(q, isCorrect, userAns);
+      visualCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function renderVisualSolutionCanvas(q, isCorrect, userAns) {
+      const canvas = document.getElementById('solution-canvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.fillStyle = "#090d16";
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+      for (let y = 0; y < h; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText(`DIGITAL SAT MATH • ${currentCategory.toUpperCase()}`, 30, 36);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 20px sans-serif";
+      ctx.fillText(q.title, 30, 64);
+
+      // BOX ALGEBRICO
+      ctx.fillStyle = "#131a26";
+      ctx.strokeStyle = "#243044";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(30, 85, 410, 280, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#f59e0b";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText("📐 METODO ALGEBRICO UFFICIALE", 48, 116);
+
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "14px monospace";
+      q.alg.forEach((step, i) => { ctx.fillText(step, 48, 155 + (i * 38)); });
+
+      // BOX DESMOS
+      ctx.fillStyle = "#131a26";
+      ctx.strokeStyle = "#0891b2";
+      ctx.beginPath();
+      ctx.roundRect(460, 85, 430, 280, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#06b6d4";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText("⚡ TRUCCO DESMOS (RISOLUZIONE < 20s)", 478, 116);
+
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = "13px sans-serif";
+      q.dsm.forEach((hack, i) => { ctx.fillText(hack, 478, 155 + (i * 34)); });
+
+      // Mini Grafica
+      const gx = 750, gy = 290;
+      ctx.strokeStyle = "#475569";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(gx - 55, gy); ctx.lineTo(gx + 55, gy);
+      ctx.moveTo(gx, gy - 45); ctx.lineTo(gx + 45, gy + 45);
+      ctx.stroke();
+
+      if (q.gType === "circle") {
+        ctx.strokeStyle = "#38bdf8";
+        ctx.beginPath(); ctx.arc(gx, gy, 28, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = "#22c55e";
+        ctx.beginPath(); ctx.arc(gx, gy, 4, 0, Math.PI * 2); ctx.fill();
+      } else {
+        ctx.strokeStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.moveTo(gx - 40, gy + 25);
+        ctx.lineTo(gx + 40, gy - 25);
+        ctx.stroke();
+      }
+
+      // Riepilogo in basso
+      const wasSkipped = (userAns === "SALTATA");
+      ctx.fillStyle = isCorrect ? "#14532d" : (wasSkipped ? "#451a03" : "#7f1d1d");
+      ctx.strokeStyle = isCorrect ? "#22c55e" : (wasSkipped ? "#f59e0b" : "#ef4444");
+      ctx.beginPath();
+      ctx.roundRect(30, 385, 860, 55, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 15px sans-serif";
+      const statusText = isCorrect ? 'RISPOSTA ESATTA' : (wasSkipped ? 'DOMANDA SALTATA' : 'RISPOSTA ERRATA');
+      ctx.fillText(`RISPOSTA CORRETTA: ${q.ans}   •   TEMPO: ${secondsSpent}s   •   STATO: ${statusText}`, 50, 418);
+    }
+
+    function downloadSolutionImage() {
+      const canvas = document.getElementById('solution-canvas');
+      const q = getCurrentQuestion();
+      const link = document.createElement('a');
+      link.download = `SAT_Solution_${q.id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // GESTIONE RECOVERY BOX ATTIVA E RIPETIBILE
+    function addToRecovery(q) {
+      let existing = recoveryBox.find(item => item.id === q.id);
+      if (!existing) {
+        recoveryBox.push({ id: q.id, category: currentCategory, stage: 1, qObj: q });
+      } else {
+        existing.stage = 1;
+      }
+      updateRecoveryUI();
+    }
+
+    function advanceRecovery(id) {
+      let existing = recoveryBox.find(item => item.id === id);
+      if (existing) {
+        existing.stage++;
+        if (existing.stage > 3) {
+          recoveryBox = recoveryBox.filter(item => item.id !== id);
+        }
+        updateRecoveryUI();
+      }
+    }
+
+    function retryRecoveryItem(index) {
+      isRetryingRecovery = true;
+      activeRecoveryIndex = index;
+      loadQuestion();
+    }
+
+    function updateRecoveryUI() {
+      const list = document.getElementById('recovery-list');
+      const count = document.getElementById('recovery-count');
+      count.textContent = recoveryBox.length;
+
+      if (recoveryBox.length === 0) {
+        list.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Nessun errore registrato.</p>`;
+        return;
+      }
+
+      list.innerHTML = recoveryBox.map((item, idx) => `
+        <div class="recovery-item">
+          <div class="recovery-header">
+            <strong>${item.id}</strong>
+            <span class="recovery-stage">Liv. ${item.stage}/3</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.75rem; color:var(--text-muted);">${item.category}</span>
+            <button class="recovery-retry-btn" onclick="retryRecoveryItem(${idx})">🔁 Ripeti Ora</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function nextQuestion() {
+      if (isRetryingRecovery) {
+        isRetryingRecovery = false;
+        loadQuestion();
+        return;
+      }
+
+      if (currentIndex === 14) {
+        // Finita la categoria! Mostra il prompt per il reset
+        document.getElementById('finish-modal').style.display = 'flex';
+        return;
+      }
+
+      currentIndex = (currentIndex + 1) % 15;
+      loadQuestion();
+    }
+
+    function resetAndGenerateNewSet() {
+      closeFinishModal();
+      currentIndex = 0;
+      // Alterna tra Set 1 e Set 2 generando esercizi del tutto nuovi
+      currentSetKey = (currentSetKey === 'set1') ? 'set2' : 'set1';
+      loadQuestion();
+    }
+
+    function closeFinishModal() {
+      document.getElementById('finish-modal').style.display = 'none';
+    }
+
+    function openReferenceSheet() {
+      document.getElementById('ref-modal').style.display = 'flex';
+      drawReferenceSheet();
+    }
+
+    function closeReferenceSheet() {
+      document.getElementById('ref-modal').style.display = 'none';
+    }
+
+    function drawReferenceSheet() {
+      const canvas = document.getElementById('ref-sheet-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = "#0b0f19";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillText("FORMULE CHIAVE DIGITAL SAT", 20, 30);
+
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath(); ctx.roundRect(20, 50, 275, 140, 8); ctx.stroke();
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText("Triangolo 30°-60°-90°", 35, 75);
+      ctx.font = "12px monospace";
+      ctx.fillText("• Cateto corto = x", 35, 105);
+      ctx.fillText("• Cateto lungo = x√3", 35, 130);
+      ctx.fillText("• Ipotenusa    = 2x", 35, 155);
+
+      ctx.beginPath(); ctx.roundRect(315, 50, 280, 140, 8); ctx.stroke();
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText("Triangolo 45°-45°-90°", 330, 75);
+      ctx.font = "12px monospace";
+      ctx.fillText("• Cateti    = s", 330, 105);
+      ctx.fillText("• Ipotenusa = s√2", 330, 130);
+
+      ctx.beginPath(); ctx.roundRect(20, 210, 575, 145, 8); ctx.stroke();
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText("Aree, Circonferenze e Volumi", 35, 235);
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "13px monospace";
+      ctx.fillText("Cerchio: Area = πr²  |  Circonferenza = 2πr", 35, 265);
+      ctx.fillText("Cilindro Volume = πr²h  |  Sfera Volume = (4/3)πr³", 35, 295);
+      ctx.fillText("Angoli: Somma triangolo = 180° | Arco giro = 360°", 35, 325);
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
