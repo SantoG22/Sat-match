@@ -55,14 +55,14 @@
 
     /* SIDEBAR */
     #sidebar {
-      width: 320px;
-      min-width: 290px;
+      width: 330px;
+      min-width: 300px;
       background: var(--card-bg);
       border-right: 1px solid var(--border);
-      padding: 18px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       overflow-y: auto;
     }
 
@@ -80,27 +80,27 @@
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--text-muted);
-      margin-top: 6px;
+      margin-top: 4px;
       font-weight: 700;
     }
 
     .category-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .category-btn {
       background: var(--card-alt);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 8px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       color: var(--text);
       cursor: pointer;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
       transition: all 0.2s ease;
       text-align: left;
@@ -119,8 +119,100 @@
     }
 
     .category-icon {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       line-height: 1;
+    }
+
+    /* RECOVERY LEITNER SYSTEM */
+    .leitner-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .leitner-today-card {
+      background: #1f293d;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .leitner-folder-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .leitner-tab-btn {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 2px;
+      font-size: 0.68rem;
+      text-align: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .leitner-tab-btn.active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #3b82f6;
+      font-weight: 700;
+    }
+
+    .recovery-list-wrap {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 240px;
+      padding-right: 2px;
+    }
+
+    .recovery-item {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .recovery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .recovery-retry-btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.73rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .recovery-retry-btn:hover { background: #1d4ed8; }
+
+    .recovery-stage {
+      font-size: 0.68rem;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #374151;
+      color: var(--accent);
+      font-weight: 600;
     }
 
     /* AREA CENTRALE */
@@ -321,45 +413,6 @@
       border: 1px solid var(--border);
     }
 
-    /* RECOVERY BOX ATTIVO & RIPETIBILE */
-    .recovery-item {
-      background: var(--card-alt);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-top: 8px;
-      font-size: 0.82rem;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .recovery-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .recovery-retry-btn {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .recovery-retry-btn:hover { background: #1d4ed8; }
-
-    .recovery-stage {
-      font-size: 0.72rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #374151;
-      color: var(--accent);
-    }
-
     /* DESMOS */
     #desmos-sidebar {
       width: 380px;
@@ -457,17 +510,36 @@
       </button>
     </div>
 
-    <!-- RECOVERY BOX -->
-    <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-top: 10px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
-        <span class="section-label" style="margin:0;">🎯 Recovery Box</span>
-        <span id="recovery-count" style="color: var(--accent); font-weight:700; font-size:0.85rem;">0</span>
+    <!-- RECOVERY BOX LEITNER -->
+    <div class="leitner-container">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="section-label" style="margin:0;">🎯 Recovery (Leitner)</span>
+        <span id="total-recovery-count" style="color: var(--accent); font-weight:700; font-size:0.82rem;">0 errori</span>
       </div>
-      <p style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px;">
-        Clicca su "Ripeti" per affrontare subito l'errore e padroneggiarlo.
-      </p>
-      <div id="recovery-list" style="overflow-y: auto; flex: 1;">
-        <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Nessun errore registrato.</p>
+
+      <!-- Scatola Prioritaria di Oggi -->
+      <div class="leitner-today-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:0.8rem; color:#93c5fd;">📌 Da Ripassare Oggi</strong>
+          <span id="due-count" style="background:#2563eb; color:#fff; font-size:0.72rem; padding:1px 6px; border-radius:10px; font-weight:700;">0</span>
+        </div>
+        <button id="start-due-btn" class="recovery-retry-btn" style="width:100%; padding:6px; display:none;" onclick="startLeitnerDueSession()">
+          🚀 Avvia Ripasso di Oggi
+        </button>
+      </div>
+
+      <!-- Cartelle Leitner Box 1..5 -->
+      <div class="leitner-folder-grid">
+        <button class="leitner-tab-btn active" id="tab-due" onclick="switchLeitnerView('due')">Oggi</button>
+        <button class="leitner-tab-btn" id="tab-1" onclick="switchLeitnerView(1)">B1<br><small>1gg</small></button>
+        <button class="leitner-tab-btn" id="tab-2" onclick="switchLeitnerView(2)">B2<br><small>3gg</small></button>
+        <button class="leitner-tab-btn" id="tab-3" onclick="switchLeitnerView(3)">B3<br><small>7gg</small></button>
+        <button class="leitner-tab-btn" id="tab-4" onclick="switchLeitnerView(4)">B4<br><small>14g</small></button>
+        <button class="leitner-tab-btn" id="tab-5" onclick="switchLeitnerView(5)">B5<br><small>30g</small></button>
+      </div>
+
+      <div class="recovery-list-wrap" id="recovery-list">
+        <p style="font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top:8px;">Nessun quesito da ripassare.</p>
       </div>
     </div>
   </aside>
@@ -719,15 +791,86 @@
       }
     };
 
+    // MAPPA COMPLETA DEI QUESITI PER ID
+    const questionIndexMap = {};
+    Object.keys(questionSets).forEach(cat => {
+      Object.keys(questionSets[cat]).forEach(setKey => {
+        questionSets[cat][setKey].forEach(q => {
+          questionIndexMap[q.id] = { qObj: q, category: cat };
+        });
+      });
+    });
+
     let currentCategory = 'algebra';
     let currentSetKey = 'set1';
     let currentIndex = 0;
     let selectedOption = null;
     let secondsSpent = 0;
     let timerInterval = null;
-    let recoveryBox = [];
+
+    // SISTEMA LEITNER (INTERVALLI IN GIORNI)
+    const LEITNER_DAYS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30 };
+    let currentLeitnerView = 'due'; // 'due' oppure 1, 2, 3, 4, 5
     let isRetryingRecovery = false;
-    let activeRecoveryIndex = -1;
+    let activeRecoveryQ = null;
+
+    function getTodayString() {
+      const d = new Date();
+      return d.toISOString().split('T')[0];
+    }
+
+    function addDays(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+
+    function getStoredLeitner() {
+      try {
+        return JSON.parse(localStorage.getItem('leitner_recovery_db') || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveStoredLeitner(data) {
+      localStorage.setItem('leitner_recovery_db', JSON.stringify(data));
+    }
+
+    // Inserimento o retrocessione nel Box 1
+    function recordLeitnerFailure(q) {
+      const data = getStoredLeitner();
+      const existing = data[q.id] || {};
+      data[q.id] = {
+        id: q.id,
+        category: currentCategory,
+        box: 1, // Retrocede o parte sempre da Box 1
+        lastReviewed: getTodayString(),
+        nextReview: addDays(LEITNER_DAYS[1]),
+        failCount: (existing.failCount || 0) + 1
+      };
+      saveStoredLeitner(data);
+      updateRecoveryUI();
+    }
+
+    // Avanzamento al Box successivo se superata in ripasso
+    function recordLeitnerSuccess(qid) {
+      const data = getStoredLeitner();
+      if (!data[qid]) return;
+
+      const currentBox = data[qid].box || 1;
+      if (currentBox >= 5) {
+        // Mastered: completata la scatola 5
+        delete data[qid];
+      } else {
+        const nextBox = currentBox + 1;
+        data[qid].box = nextBox;
+        data[qid].lastReviewed = getTodayString();
+        data[qid].nextReview = addDays(LEITNER_DAYS[nextBox]);
+      }
+      saveStoredLeitner(data);
+      updateRecoveryUI();
+    }
 
     function getDifficultyLabel(idx) {
       if (idx < 3) return "LIV. 1 (FOUNDATIONS)";
@@ -739,6 +882,7 @@
 
     function selectCategory(catKey) {
       isRetryingRecovery = false;
+      activeRecoveryQ = null;
       currentCategory = catKey;
       currentSetKey = 'set1';
       currentIndex = 0;
@@ -776,8 +920,8 @@
     }
 
     function getCurrentQuestion() {
-      if (isRetryingRecovery && activeRecoveryIndex >= 0 && recoveryBox[activeRecoveryIndex]) {
-        return recoveryBox[activeRecoveryIndex].qObj;
+      if (isRetryingRecovery && activeRecoveryQ) {
+        return activeRecoveryQ;
       }
       return questionSets[currentCategory][currentSetKey][currentIndex];
     }
@@ -786,7 +930,7 @@
       const q = getCurrentQuestion();
 
       if (isRetryingRecovery) {
-        document.getElementById('progress-badge').textContent = `RECOVERY: ${q.id}`;
+        document.getElementById('progress-badge').textContent = `LEITNER: ${q.id}`;
         document.getElementById('difficulty-badge').textContent = "MODALITÀ RECUPERO";
       } else {
         document.getElementById('progress-badge').textContent = `QUESITO ${currentIndex + 1} / 15`;
@@ -874,7 +1018,7 @@
     function skipQuestion() {
       clearInterval(timerInterval);
       const q = getCurrentQuestion();
-      addToRecovery(q);
+      recordLeitnerFailure(q);
       showSolution(q, false, "SALTATA");
     }
 
@@ -888,13 +1032,15 @@
       document.getElementById('next-btn').style.display = "inline-flex";
 
       if (userAns === "SALTATA") {
-        resultStatus.innerHTML = `<span style="color:var(--error)">⏭ Quesito Saltato! Registrato nel Recovery Box. Corretta: <strong>${q.ans}</strong></span>`;
+        resultStatus.innerHTML = `<span style="color:var(--error)">⏭ Quesito Saltato! Assegnato a Box 1. Corretta: <strong>${q.ans}</strong></span>`;
       } else if (isCorrect) {
         resultStatus.innerHTML = `<span style="color:var(--success)">✔ Risposta Esatta! (${userAns})</span>`;
-        if (isRetryingRecovery) advanceRecovery(q.id);
+        if (isRetryingRecovery) {
+          recordLeitnerSuccess(q.id);
+        }
       } else {
-        resultStatus.innerHTML = `<span style="color:var(--error)">✖ Risposta Errata. Registrato nel Recovery Box. Corretta: <strong>${q.ans}</strong></span>`;
-        addToRecovery(q);
+        resultStatus.innerHTML = `<span style="color:var(--error)">✖ Risposta Errata. Retrocesso a Box 1. Corretta: <strong>${q.ans}</strong></span>`;
+        recordLeitnerFailure(q);
       }
 
       renderVisualSolutionCanvas(q, isCorrect, userAns);
@@ -1002,67 +1148,103 @@
       link.click();
     }
 
-    // GESTIONE RECOVERY BOX ATTIVA E RIPETIBILE
-    function addToRecovery(q) {
-      let existing = recoveryBox.find(item => item.id === q.id);
-      if (!existing) {
-        recoveryBox.push({ id: q.id, category: currentCategory, stage: 1, qObj: q });
-      } else {
-        existing.stage = 1;
-      }
-      updateRecoveryUI();
+    // GESTIONE INTERFACCIA E CARTELLE LEITNER
+    function switchLeitnerView(view) {
+      currentLeitnerView = view;
+      document.querySelectorAll('.leitner-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(view === 'due' ? 'tab-due' : `tab-${view}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderLeitnerList();
     }
 
-    function advanceRecovery(id) {
-      let existing = recoveryBox.find(item => item.id === id);
-      if (existing) {
-        existing.stage++;
-        if (existing.stage > 3) {
-          recoveryBox = recoveryBox.filter(item => item.id !== id);
-        }
-        updateRecoveryUI();
-      }
-    }
-
-    function retryRecoveryItem(index) {
+    function retryLeitnerItem(qid) {
+      if (!questionIndexMap[qid]) return;
       isRetryingRecovery = true;
-      activeRecoveryIndex = index;
+      activeRecoveryQ = questionIndexMap[qid].qObj;
       loadQuestion();
     }
 
-    function updateRecoveryUI() {
-      const list = document.getElementById('recovery-list');
-      const count = document.getElementById('recovery-count');
-      count.textContent = recoveryBox.length;
+    function startLeitnerDueSession() {
+      const data = getStoredLeitner();
+      const today = getTodayString();
+      const dueItems = Object.values(data).filter(item => item.nextReview <= today);
+      if (dueItems.length > 0) {
+        retryLeitnerItem(dueItems[0].id);
+      }
+    }
 
-      if (recoveryBox.length === 0) {
-        list.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Nessun errore registrato.</p>`;
+    function updateRecoveryUI() {
+      const data = getStoredLeitner();
+      const today = getTodayString();
+      const items = Object.values(data);
+      const dueItems = items.filter(i => i.nextReview <= today);
+
+      document.getElementById('total-recovery-count').textContent = `${items.length} quesiti`;
+      document.getElementById('due-count').textContent = dueItems.length;
+
+      const startDueBtn = document.getElementById('start-due-btn');
+      startDueBtn.style.display = dueItems.length > 0 ? "block" : "none";
+
+      // Aggiorna etichette bottoni tab
+      for (let b = 1; b <= 5; b++) {
+        const count = items.filter(i => i.box === b).length;
+        const btn = document.getElementById(`tab-${b}`);
+        if (btn) btn.innerHTML = `B${b}<br><small>(${count})</small>`;
+      }
+      const dueTab = document.getElementById('tab-due');
+      if (dueTab) dueTab.innerHTML = `Oggi<br><small>(${dueItems.length})</small>`;
+
+      renderLeitnerList();
+    }
+
+    function renderLeitnerList() {
+      const list = document.getElementById('recovery-list');
+      const data = getStoredLeitner();
+      const today = getTodayString();
+      const items = Object.values(data);
+
+      let filtered = [];
+      if (currentLeitnerView === 'due') {
+        filtered = items.filter(i => i.nextReview <= today);
+      } else {
+        filtered = items.filter(i => i.box === Number(currentLeitnerView));
+      }
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<p style="font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top:8px;">Nessun quesito in questa cartella.</p>`;
         return;
       }
 
-      list.innerHTML = recoveryBox.map((item, idx) => `
-        <div class="recovery-item">
-          <div class="recovery-header">
-            <strong>${item.id}</strong>
-            <span class="recovery-stage">Liv. ${item.stage}/3</span>
+      list.innerHTML = filtered.map(item => {
+        const isDue = item.nextReview <= today;
+        return `
+          <div class="recovery-item" style="${isDue ? 'border-color:#3b82f6;' : ''}">
+            <div class="recovery-header">
+              <strong>${item.id}</strong>
+              <span class="recovery-stage">Box ${item.box}/5</span>
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+              <span>${item.category}</span>
+              <span style="color:${isDue ? 'var(--warn)' : 'var(--text-muted)'};">
+                ${isDue ? '⚠️ Scaduto oggi' : 'Ripasso: ' + item.nextReview}
+              </span>
+            </div>
+            <button class="recovery-retry-btn" onclick="retryLeitnerItem('${item.id}')">🔁 Ripassa Quesito</button>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.75rem; color:var(--text-muted);">${item.category}</span>
-            <button class="recovery-retry-btn" onclick="retryRecoveryItem(${idx})">🔁 Ripeti Ora</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function nextQuestion() {
       if (isRetryingRecovery) {
         isRetryingRecovery = false;
+        activeRecoveryQ = null;
         loadQuestion();
         return;
       }
 
       if (currentIndex === 14) {
-        // Finita la categoria! Mostra il prompt per il reset
+        // Categoria terminata
         document.getElementById('finish-modal').style.display = 'flex';
         return;
       }
@@ -1074,7 +1256,6 @@
     function resetAndGenerateNewSet() {
       closeFinishModal();
       currentIndex = 0;
-      // Alterna tra Set 1 e Set 2 generando esercizi del tutto nuovi
       currentSetKey = (currentSetKey === 'set1') ? 'set2' : 'set1';
       loadQuestion();
     }
@@ -1133,7 +1314,10 @@
       ctx.fillText("Angoli: Somma triangolo = 180° | Arco giro = 360°", 35, 325);
     }
 
+    // Caricamento iniziale
+    updateRecoveryUI();
     loadQuestion();
   </script>
 </body>
 </html>
+
