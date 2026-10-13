@@ -55,8 +55,8 @@
 
     /* SIDEBAR */
     #sidebar {
-      width: 330px;
-      min-width: 300px;
+      width: 360px;
+      min-width: 330px;
       background: var(--card-bg);
       border-right: 1px solid var(--border);
       padding: 16px;
@@ -123,97 +123,132 @@
       line-height: 1;
     }
 
-    /* RECOVERY LEITNER SYSTEM */
+    /* RECOVERY LEITNER FOLDERS */
     .leitner-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       flex: 1;
-      overflow: hidden;
       margin-top: 8px;
     }
 
-    .leitner-today-card {
-      background: #1f293d;
-      border: 1px solid #3b82f6;
+    .leitner-due-card {
+      background: #1e293b;
+      border: 1px solid #38bdf8;
       border-radius: 8px;
-      padding: 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    .leitner-folder-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 4px;
-      margin-top: 4px;
-    }
-
-    .leitner-tab-btn {
-      background: var(--card-alt);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 2px;
-      font-size: 0.68rem;
-      text-align: center;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .leitner-tab-btn.active {
-      background: #2563eb;
-      color: #fff;
-      border-color: #3b82f6;
-      font-weight: 700;
-    }
-
-    .recovery-list-wrap {
-      flex: 1;
+    .leitner-folders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       overflow-y: auto;
-      max-height: 240px;
-      padding-right: 2px;
+      max-height: 380px;
+      padding-right: 4px;
     }
 
-    .recovery-item {
+    .folder-box {
       background: var(--card-alt);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 8px 10px;
-      margin-top: 6px;
-      font-size: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+      overflow: hidden;
+      transition: border-color 0.2s;
     }
 
-    .recovery-header {
+    .folder-box:hover {
+      border-color: #475569;
+    }
+
+    .folder-header {
+      padding: 9px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      cursor: pointer;
+      user-select: none;
+      background: #1a222d;
     }
+
+    .folder-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .folder-count-badge {
+      background: #334155;
+      color: #94a3b8;
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .folder-body {
+      display: none;
+      padding: 8px 10px;
+      background: #121720;
+      border-top: 1px solid var(--border);
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .folder-box.open .folder-body {
+      display: flex;
+    }
+
+    .topic-group {
+      background: #161e29;
+      border: 1px solid #243044;
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+
+    .topic-name {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .question-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-top: 1px dashed #243044;
+      font-size: 0.74rem;
+    }
+
+    .q-timer-badge {
+      font-size: 0.68rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .timer-due { background: #7f1d1d; color: #fca5a5; }
+    .timer-pending { background: #1e293b; color: #94a3b8; }
 
     .recovery-retry-btn {
       background: #2563eb;
       color: #fff;
       border: none;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: 4px;
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       cursor: pointer;
       font-weight: 600;
     }
     .recovery-retry-btn:hover { background: #1d4ed8; }
-
-    .recovery-stage {
-      font-size: 0.68rem;
-      padding: 2px 5px;
-      border-radius: 4px;
-      background: #374151;
-      color: var(--accent);
-      font-weight: 600;
-    }
 
     /* AREA CENTRALE */
     #main-content {
@@ -510,36 +545,28 @@
       </button>
     </div>
 
-    <!-- RECOVERY BOX LEITNER -->
+    <!-- RECOVERY BOX - CARTELLE SISTEMA LEITNER -->
     <div class="leitner-container">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="section-label" style="margin:0;">🎯 Recovery (Leitner)</span>
-        <span id="total-recovery-count" style="color: var(--accent); font-weight:700; font-size:0.82rem;">0 errori</span>
+        <span class="section-label" style="margin:0;">🎯 Recovery (Cartelle Leitner)</span>
+        <span id="total-recovery-count" style="color: var(--accent); font-weight:700; font-size:0.8rem;">0 quesiti</span>
       </div>
 
-      <!-- Scatola Prioritaria di Oggi -->
-      <div class="leitner-today-card">
+      <!-- Scatola Prioritaria / Sessione di Oggi -->
+      <div class="leitner-due-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <strong style="font-size:0.8rem; color:#93c5fd;">📌 Da Ripassare Oggi</strong>
-          <span id="due-count" style="background:#2563eb; color:#fff; font-size:0.72rem; padding:1px 6px; border-radius:10px; font-weight:700;">0</span>
+          <strong style="font-size:0.82rem; color:#bae6fd;">📌 Da Ripassare Oggi</strong>
+          <span id="due-count" style="background:#0284c7; color:#fff; font-size:0.75rem; padding:1px 8px; border-radius:12px; font-weight:700;">0</span>
         </div>
-        <button id="start-due-btn" class="recovery-retry-btn" style="width:100%; padding:6px; display:none;" onclick="startLeitnerDueSession()">
-          🚀 Avvia Ripasso di Oggi
+        <p style="font-size:0.72rem; color:var(--text-muted);">Errori con intervallo scaduto pronti per il consolidamento.</p>
+        <button id="start-due-btn" class="recovery-retry-btn" style="padding:6px; margin-top:2px; display:none;" onclick="startLeitnerDueSession()">
+          🚀 Avvia Sessione di Oggi
         </button>
       </div>
 
-      <!-- Cartelle Leitner Box 1..5 -->
-      <div class="leitner-folder-grid">
-        <button class="leitner-tab-btn active" id="tab-due" onclick="switchLeitnerView('due')">Oggi</button>
-        <button class="leitner-tab-btn" id="tab-1" onclick="switchLeitnerView(1)">B1<br><small>1gg</small></button>
-        <button class="leitner-tab-btn" id="tab-2" onclick="switchLeitnerView(2)">B2<br><small>3gg</small></button>
-        <button class="leitner-tab-btn" id="tab-3" onclick="switchLeitnerView(3)">B3<br><small>7gg</small></button>
-        <button class="leitner-tab-btn" id="tab-4" onclick="switchLeitnerView(4)">B4<br><small>14g</small></button>
-        <button class="leitner-tab-btn" id="tab-5" onclick="switchLeitnerView(5)">B5<br><small>30g</small></button>
-      </div>
-
-      <div class="recovery-list-wrap" id="recovery-list">
-        <p style="font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top:8px;">Nessun quesito da ripassare.</p>
+      <!-- Elenco delle 5 Cartelle Leitner Fisiche -->
+      <div class="leitner-folders-list" id="folders-container">
+        <!-- Generato dinamicamente con Cartella 1..5 e sottocartelle topic -->
       </div>
     </div>
   </aside>
@@ -643,7 +670,7 @@
       settingsMenu: false
     });
 
-    // BANCA DATI MULTI-SET (SET 1 & SET 2 CON ESERCIZI DIVERSI)
+    // BANCA DATI MULTI-SET
     const questionSets = {
       algebra: {
         set1: [
@@ -713,7 +740,7 @@
           { id: "ADV-11-B", type: "mcq", q: "Resto della divisione di (x² + 5x + 7) per (x - 1):", options: ["13", "7", "1", "3"], ans: "13", title: "RESTO POLINOMIALE", alg: ["1. P(1) = 1 + 5 + 7 = 13."], dsm: ["P(1) = 13."], gType: "parabola" },
           { id: "ADV-12-B", type: "spr", q: "Se x² + y² = 36, qual è l'area del cerchio divisa per π?", ans: "36", title: "AREA DA EQUAZIONE", alg: ["1. r² = 36", "2. Area = π r² = 36π => Diviso π fa 36."], dsm: ["36."], gType: "circle" },
           { id: "ADV-13-B", type: "mcq", q: "Per quanti valori x si intersecano y = x² e y = 4?", options: ["2", "1", "0", "4"], ans: "2", title: "INTERSEZIONE", alg: ["1. x² = 4 => x = ±2 (2 valori)."], dsm: ["Due punti."], gType: "parabola" },
-          { id: "ADV-14-B", type: "spr", q: "Se (x + 3)(x - 5) = -15, qual è la soluzione positiva per x?", ans: "2", title: "EQUAZIONE DI SECONDO GRADO", alg: ["1. x² - 2x - 15 = -15 => x² - 2x = 0", "2. x(x - 2) = 0 => soluzione positiva = 2."], dsm: ["x = 2."], gType: "parabola" },
+          { id: "ADV-14-B", type: "spr", q: "Se (x + 3)(x - 5) = -15, qual è la对方zione positiva per x?", ans: "2", title: "EQUAZIONE DI SECONDO GRADO", alg: ["1. x² - 2x - 15 = -15 => x² - 2x = 0", "2. x(x - 2) = 0 => soluzione positiva = 2."], dsm: ["x = 2."], gType: "parabola" },
           { id: "ADV-15-B", type: "mcq", q: "Qual è l'asintoto orizzontale di y = (3x + 1) / (x - 2)?", options: ["y = 3", "x = 2", "y = 0", "y = -1/2"], ans: "y = 3", title: "ASINTOTO ORIZZONTALE", alg: ["1. Rapporto coefficienti di grado max: 3 / 1 = 3."], dsm: ["y = 3."], gType: "line" }
         ]
       },
@@ -791,7 +818,7 @@
       }
     };
 
-    // MAPPA COMPLETA DEI QUESITI PER ID
+    // Mappatura completa per ID
     const questionIndexMap = {};
     Object.keys(questionSets).forEach(cat => {
       Object.keys(questionSets[cat]).forEach(setKey => {
@@ -808,9 +835,16 @@
     let secondsSpent = 0;
     let timerInterval = null;
 
-    // SISTEMA LEITNER (INTERVALLI IN GIORNI)
-    const LEITNER_DAYS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30 };
-    let currentLeitnerView = 'due'; // 'due' oppure 1, 2, 3, 4, 5
+    // DEFINIZIONE SISTEMA LEITNER (CARTELLE 1-5 E INTERVALLI IN GIORNI)
+    const LEITNER_FOLDERS_CONFIG = [
+      { box: 1, name: "Cartella 1: Revisione Quotidiana", intervalDays: 1, desc: "Ripasso ogni 24h" },
+      { box: 2, name: "Cartella 2: Consolidamento Iniziale", intervalDays: 3, desc: "Ripasso ogni 3 giorni" },
+      { box: 3, name: "Cartella 3: Memoria Intermedia", intervalDays: 7, desc: "Ripasso ogni 7 giorni" },
+      { box: 4, name: "Cartella 4: Padronanza Avanzata", intervalDays: 14, desc: "Ripasso ogni 14 giorni" },
+      { box: 5, name: "Cartella 5: Memoria a Lungo Termine", intervalDays: 30, desc: "Ripasso ogni 30 giorni" }
+    ];
+
+    let openFoldersState = { 1: true }; // Cartella 1 aperta di default
     let isRetryingRecovery = false;
     let activeRecoveryQ = null;
 
@@ -823,6 +857,13 @@
       const d = new Date();
       d.setDate(d.getDate() + days);
       return d.toISOString().split('T')[0];
+    }
+
+    function getDaysDifference(targetDateStr) {
+      const today = new Date(getTodayString());
+      const target = new Date(targetDateStr);
+      const diffTime = target - today;
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
 
     function getStoredLeitner() {
@@ -843,30 +884,32 @@
       const existing = data[q.id] || {};
       data[q.id] = {
         id: q.id,
+        title: q.title,
         category: currentCategory,
-        box: 1, // Retrocede o parte sempre da Box 1
+        box: 1, // Retrocessione automatica al Box 1 secondo Leitner
         lastReviewed: getTodayString(),
-        nextReview: addDays(LEITNER_DAYS[1]),
+        nextReview: addDays(1),
         failCount: (existing.failCount || 0) + 1
       };
       saveStoredLeitner(data);
       updateRecoveryUI();
     }
 
-    // Avanzamento al Box successivo se superata in ripasso
+    // Avanzamento al Box successivo
     function recordLeitnerSuccess(qid) {
       const data = getStoredLeitner();
       if (!data[qid]) return;
 
       const currentBox = data[qid].box || 1;
       if (currentBox >= 5) {
-        // Mastered: completata la scatola 5
+        // Padroneggiato completamente
         delete data[qid];
       } else {
         const nextBox = currentBox + 1;
+        const cfg = LEITNER_FOLDERS_CONFIG.find(c => c.box === nextBox);
         data[qid].box = nextBox;
         data[qid].lastReviewed = getTodayString();
-        data[qid].nextReview = addDays(LEITNER_DAYS[nextBox]);
+        data[qid].nextReview = addDays(cfg ? cfg.intervalDays : 30);
       }
       saveStoredLeitner(data);
       updateRecoveryUI();
@@ -930,8 +973,8 @@
       const q = getCurrentQuestion();
 
       if (isRetryingRecovery) {
-        document.getElementById('progress-badge').textContent = `LEITNER: ${q.id}`;
-        document.getElementById('difficulty-badge').textContent = "MODALITÀ RECUPERO";
+        document.getElementById('progress-badge').textContent = `RECOVERY: ${q.id}`;
+        document.getElementById('difficulty-badge').textContent = "MODALITÀ RECUPERO LEITNER";
       } else {
         document.getElementById('progress-badge').textContent = `QUESITO ${currentIndex + 1} / 15`;
         document.getElementById('difficulty-badge').textContent = getDifficultyLabel(currentIndex);
@@ -1032,14 +1075,14 @@
       document.getElementById('next-btn').style.display = "inline-flex";
 
       if (userAns === "SALTATA") {
-        resultStatus.innerHTML = `<span style="color:var(--error)">⏭ Quesito Saltato! Assegnato a Box 1. Corretta: <strong>${q.ans}</strong></span>`;
+        resultStatus.innerHTML = `<span style="color:var(--error)">⏭ Saltato! Spostato nella Cartella 1 (Ripasso 24h). Risposta: <strong>${q.ans}</strong></span>`;
       } else if (isCorrect) {
         resultStatus.innerHTML = `<span style="color:var(--success)">✔ Risposta Esatta! (${userAns})</span>`;
         if (isRetryingRecovery) {
           recordLeitnerSuccess(q.id);
         }
       } else {
-        resultStatus.innerHTML = `<span style="color:var(--error)">✖ Risposta Errata. Retrocesso a Box 1. Corretta: <strong>${q.ans}</strong></span>`;
+        resultStatus.innerHTML = `<span style="color:var(--error)">✖ Errato. Retrocesso alla Cartella 1 (Ripasso 24h). Risposta: <strong>${q.ans}</strong></span>`;
         recordLeitnerFailure(q);
       }
 
@@ -1148,13 +1191,10 @@
       link.click();
     }
 
-    // GESTIONE INTERFACCIA E CARTELLE LEITNER
-    function switchLeitnerView(view) {
-      currentLeitnerView = view;
-      document.querySelectorAll('.leitner-tab-btn').forEach(btn => btn.classList.remove('active'));
-      const activeBtn = document.getElementById(view === 'due' ? 'tab-due' : `tab-${view}`);
-      if (activeBtn) activeBtn.classList.add('active');
-      renderLeitnerList();
+    // GESTIONE CARTELLE FISICHE LEITNER E ARGOMENTI
+    function toggleFolder(boxNumber) {
+      openFoldersState[boxNumber] = !openFoldersState[boxNumber];
+      updateRecoveryUI();
     }
 
     function retryLeitnerItem(qid) {
@@ -1185,54 +1225,85 @@
       const startDueBtn = document.getElementById('start-due-btn');
       startDueBtn.style.display = dueItems.length > 0 ? "block" : "none";
 
-      // Aggiorna etichette bottoni tab
-      for (let b = 1; b <= 5; b++) {
-        const count = items.filter(i => i.box === b).length;
-        const btn = document.getElementById(`tab-${b}`);
-        if (btn) btn.innerHTML = `B${b}<br><small>(${count})</small>`;
-      }
-      const dueTab = document.getElementById('tab-due');
-      if (dueTab) dueTab.innerHTML = `Oggi<br><small>(${dueItems.length})</small>`;
+      const container = document.getElementById('folders-container');
+      container.innerHTML = "";
 
-      renderLeitnerList();
-    }
+      LEITNER_FOLDERS_CONFIG.forEach(cfg => {
+        const boxItems = items.filter(i => i.box === cfg.box);
+        const isOpen = !!openFoldersState[cfg.box];
 
-    function renderLeitnerList() {
-      const list = document.getElementById('recovery-list');
-      const data = getStoredLeitner();
-      const today = getTodayString();
-      const items = Object.values(data);
+        // Raggruppamento per Topic all'interno della cartella
+        const topicsMap = {};
+        boxItems.forEach(item => {
+          const tName = item.title || "Argomento Generale";
+          if (!topicsMap[tName]) topicsMap[tName] = [];
+          topicsMap[tName].push(item);
+        });
 
-      let filtered = [];
-      if (currentLeitnerView === 'due') {
-        filtered = items.filter(i => i.nextReview <= today);
-      } else {
-        filtered = items.filter(i => i.box === Number(currentLeitnerView));
-      }
+        const folderEl = document.createElement('div');
+        folderEl.className = `folder-box ${isOpen ? 'open' : ''}`;
 
-      if (filtered.length === 0) {
-        list.innerHTML = `<p style="font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top:8px;">Nessun quesito in questa cartella.</p>`;
-        return;
-      }
-
-      list.innerHTML = filtered.map(item => {
-        const isDue = item.nextReview <= today;
-        return `
-          <div class="recovery-item" style="${isDue ? 'border-color:#3b82f6;' : ''}">
-            <div class="recovery-header">
-              <strong>${item.id}</strong>
-              <span class="recovery-stage">Box ${item.box}/5</span>
+        // Header Cartella
+        const headerEl = document.createElement('div');
+        headerEl.className = "folder-header";
+        headerEl.onclick = () => toggleFolder(cfg.box);
+        headerEl.innerHTML = `
+          <div class="folder-title-wrap">
+            <span>${isOpen ? '📂' : '📁'}</span>
+            <div>
+              <div>${cfg.name}</div>
+              <small style="color:var(--text-muted); font-size:0.7rem; font-weight:normal;">${cfg.desc}</small>
             </div>
-            <div style="font-size:0.72rem; color:var(--text-muted); display:flex; justify-content:space-between;">
-              <span>${item.category}</span>
-              <span style="color:${isDue ? 'var(--warn)' : 'var(--text-muted)'};">
-                ${isDue ? '⚠️ Scaduto oggi' : 'Ripasso: ' + item.nextReview}
-              </span>
-            </div>
-            <button class="recovery-retry-btn" onclick="retryLeitnerItem('${item.id}')">🔁 Ripassa Quesito</button>
           </div>
+          <span class="folder-count-badge">${boxItems.length}</span>
         `;
-      }).join('');
+        folderEl.appendChild(headerEl);
+
+        // Body Cartella con Topic e Singole Domande
+        const bodyEl = document.createElement('div');
+        bodyEl.className = "folder-body";
+
+        if (boxItems.length === 0) {
+          bodyEl.innerHTML = `<p style="font-size:0.72rem; color:var(--text-muted); font-style:italic;">Nessun argomento presente in questa cartella.</p>`;
+        } else {
+          Object.keys(topicsMap).forEach(topicName => {
+            const groupEl = document.createElement('div');
+            groupEl.className = "topic-group";
+            
+            let questionsHtml = topicsMap[topicName].map(qItem => {
+              const daysLeft = getDaysDifference(qItem.nextReview);
+              let timerBadge = "";
+              if (daysLeft <= 0) {
+                timerBadge = `<span class="q-timer-badge timer-due">Scaduto Oggi!</span>`;
+              } else {
+                timerBadge = `<span class="q-timer-badge timer-pending">Fra ${daysLeft} gg (${qItem.nextReview})</span>`;
+              }
+
+              return `
+                <div class="question-row">
+                  <div>
+                    <strong style="color:#e2e8f0;">${qItem.id}</strong>
+                    <div style="margin-top:2px;">${timerBadge}</div>
+                  </div>
+                  <button class="recovery-retry-btn" onclick="retryLeitnerItem('${qItem.id}')">Ripassa</button>
+                </div>
+              `;
+            }).join('');
+
+            groupEl.innerHTML = `
+              <div class="topic-name">
+                <span>📌 ${topicName}</span>
+                <span style="font-size:0.68rem; opacity:0.8;">${topicsMap[topicName].length} Q</span>
+              </div>
+              ${questionsHtml}
+            `;
+            bodyEl.appendChild(groupEl);
+          });
+        }
+
+        folderEl.appendChild(bodyEl);
+        container.appendChild(folderEl);
+      });
     }
 
     function nextQuestion() {
@@ -1244,7 +1315,6 @@
       }
 
       if (currentIndex === 14) {
-        // Categoria terminata
         document.getElementById('finish-modal').style.display = 'flex';
         return;
       }
@@ -1314,10 +1384,9 @@
       ctx.fillText("Angoli: Somma triangolo = 180° | Arco giro = 360°", 35, 325);
     }
 
-    // Caricamento iniziale
+    // Avvio e popolamento UI
     updateRecoveryUI();
     loadQuestion();
   </script>
 </body>
 </html>
-
