@@ -123,7 +123,7 @@
       line-height: 1;
     }
 
-    /* RECOVERY LEITNER FOLDERS - VISIBILITÀ GARANTITA */
+    /* RECOVERY LEITNER FOLDERS */
     .leitner-container {
       display: flex;
       flex-direction: column;
@@ -565,9 +565,7 @@
       </div>
 
       <!-- Elenco delle 5 Cartelle Leitner Fisiche -->
-      <div class="leitner-folders-list" id="folders-container">
-        <!-- Generato dinamicamente con Cartella 1..5 e sottocartelle topic -->
-      </div>
+      <div class="leitner-folders-list" id="folders-container"></div>
     </div>
   </aside>
 
@@ -828,14 +826,17 @@
       });
     });
 
-    let currentCategory = 'algebra';
-    let currentSetKey = 'set1';
-    let currentIndex = 0;
+    // RECUPERO DELLO STATO DELLA SESSIONE (LOCALSTORAGE)
+    const savedState = JSON.parse(localStorage.getItem('sat_session_progress') || '{}');
+    let currentCategory = savedState.currentCategory || 'algebra';
+    let currentSetKey = savedState.currentSetKey || 'set1';
+    let currentIndex = typeof savedState.currentIndex === 'number' ? savedState.currentIndex : 0;
+    
     let selectedOption = null;
     let secondsSpent = 0;
     let timerInterval = null;
 
-    // DEFINIZIONE SISTEMA LEITNER (CARTELLE 1-5 E INTERVALLI IN GIORNI)
+    // DEFINIZIONE SISTEMA LEITNER
     const LEITNER_FOLDERS_CONFIG = [
       { box: 1, name: "Cartella 1: Revisione Quotidiana", intervalDays: 1, desc: "Ripasso ogni 24h" },
       { box: 2, name: "Cartella 2: Consolidamento Iniziale", intervalDays: 3, desc: "Ripasso ogni 3 giorni" },
@@ -847,6 +848,16 @@
     let openFoldersState = { 1: true, 2: false, 3: false, 4: false, 5: false };
     let isRetryingRecovery = false;
     let activeRecoveryQ = null;
+
+    // Salva lo stato del test corrente
+    function saveSessionProgress() {
+      if (isRetryingRecovery) return;
+      localStorage.setItem('sat_session_progress', JSON.stringify({
+        currentCategory: currentCategory,
+        currentSetKey: currentSetKey,
+        currentIndex: currentIndex
+      }));
+    }
 
     function getTodayString() {
       const d = new Date();
@@ -878,7 +889,6 @@
       localStorage.setItem('leitner_recovery_db', JSON.stringify(data));
     }
 
-    // Inserimento o retrocessione nel Box 1
     function recordLeitnerFailure(q) {
       const data = getStoredLeitner();
       const existing = data[q.id] || {};
@@ -895,7 +905,6 @@
       updateRecoveryUI();
     }
 
-    // Avanzamento al Box successivo
     function recordLeitnerSuccess(qid) {
       const data = getStoredLeitner();
       if (!data[qid]) return;
@@ -922,16 +931,20 @@
       return "LIV. 5 (IMPOSSIBLE / 800)";
     }
 
-    function selectCategory(catKey) {
+    function selectCategory(catKey, resetIndex = true) {
       isRetryingRecovery = false;
       activeRecoveryQ = null;
       currentCategory = catKey;
-      currentSetKey = 'set1';
-      currentIndex = 0;
+      if (resetIndex) {
+        currentIndex = 0;
+      }
+      saveSessionProgress();
       
       document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
       const catBtns = { 'algebra': 0, 'advanced': 1, 'psda': 2, 'geometry': 3 };
-      document.querySelectorAll('.category-btn')[catBtns[catKey]].classList.add('active');
+      if (document.querySelectorAll('.category-btn')[catBtns[catKey]]) {
+        document.querySelectorAll('.category-btn')[catBtns[catKey]].classList.add('active');
+      }
 
       const labels = {
         'algebra': '🔵 HEART OF ALGEBRA',
@@ -1190,7 +1203,7 @@
       link.click();
     }
 
-    // GESTIONE CARTELLE FISICHE LEITNER E ARGOMENTI
+    // GESTIONE CARTELLE FISICHE LEITNER
     function toggleFolder(boxNumber) {
       openFoldersState[boxNumber] = !openFoldersState[boxNumber];
       updateRecoveryUI();
@@ -1231,7 +1244,6 @@
         const boxItems = items.filter(i => i.box === cfg.box);
         const isOpen = !!openFoldersState[cfg.box];
 
-        // Raggruppamento per Topic all'interno della cartella
         const topicsMap = {};
         boxItems.forEach(item => {
           const tName = item.title || "Argomento Generale";
@@ -1242,7 +1254,6 @@
         const folderEl = document.createElement('div');
         folderEl.className = `folder-box ${isOpen ? 'open' : ''}`;
 
-        // Header Cartella
         const headerEl = document.createElement('div');
         headerEl.className = "folder-header";
         headerEl.onclick = () => toggleFolder(cfg.box);
@@ -1258,7 +1269,6 @@
         `;
         folderEl.appendChild(headerEl);
 
-        // Body Cartella con Topic e Singole Domande
         const bodyEl = document.createElement('div');
         bodyEl.className = "folder-body";
 
@@ -1319,6 +1329,7 @@
       }
 
       currentIndex = (currentIndex + 1) % 15;
+      saveSessionProgress();
       loadQuestion();
     }
 
@@ -1326,6 +1337,7 @@
       closeFinishModal();
       currentIndex = 0;
       currentSetKey = (currentSetKey === 'set1') ? 'set2' : 'set1';
+      saveSessionProgress();
       loadQuestion();
     }
 
@@ -1383,9 +1395,9 @@
       ctx.fillText("Angoli: Somma triangolo = 180° | Arco giro = 360°", 35, 325);
     }
 
-    // Avvio e popolamento UI
+    // Inizializzazione con ripristino dell'ultima sessione salvata
+    selectCategory(currentCategory, false);
     updateRecoveryUI();
-    loadQuestion();
   </script>
 </body>
 </html>
